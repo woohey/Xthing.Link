@@ -1,0 +1,191 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { pickHomepageSections } from '../lib/content-hub.js';
+import { ROUTES } from '../lib/routes';
+import { SITE } from '../lib/site';
+
+const posts = await getCollection('blog', ({ data }) => data.draft !== true);
+const projects = await getCollection('projects');
+const homepage = pickHomepageSections({ posts, projects });
+---
+
+<BaseLayout title={SITE.name}>
+  <main>
+    <!-- ===== Hero — Swiss Editorial ===== -->
+    <section class="hero-panel hero-panel--editorial">
+      <div class="hero-layout">
+        <div class="hero-copy">
+          <p class="soft-pill">xthing.link</p>
+          <h1 class="page-title hero-panel__title">
+            <span>X 是未知</span><br />物是万物
+          </h1>
+          <p class="page-subtitle hero-panel__subtitle">
+            IoT × AI × 极客 — 探索、构建、连接。<br />「连接，是我们选择的方式」
+          </p>
+          <div class="hero-panel__actions">
+            <a class="primary-link--button" href={ROUTES.blog}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              阅读笔记
+            </a>
+            <a class="secondary-link--button" href={ROUTES.projects}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              项目实验室
+            </a>
+          </div>
+          <div class="hero-trust">
+            <span class="hero-trust__item">探索 · 构建 · 连接</span>
+            <span class="hero-trust__item">IoT 智能硬件</span>
+            <span class="hero-trust__item">AI × 极客</span>
+          </div>
+        </div>
+
+        <!-- Preview Panel -->
+        <div class="hero-preview">
+          <div class="preview-panel">
+            <div class="preview-panel__glow"></div>
+            <p class="preview-panel__eyebrow">工作台</p>
+            <div class="preview-panel__card">
+              <p class="preview-panel__title">ViberCoding 工作流</p>
+              <p class="preview-panel__body">智能 IoT 设备、OpenClaw、Obsidian 知识库 — 以及那些值得沉淀为长期笔记的工具与项目。</p>
+            </div>
+            <div class="preview-panel__card preview-panel__card--soft">
+              <p class="preview-panel__title">关注方向</p>
+              <div class="preview-panel__chips">
+                <span class="preview-chip">Obsidian</span>
+                <span class="preview-chip">AI工具</span>
+                <span class="preview-chip">IoT 智能硬件</span>
+                <span class="preview-chip">ViberCoding</span>
+                <span class="preview-chip">Hobbies</span>
+              </div>
+            </div>
+            <div class="preview-panel__footer">
+              <div class="preview-panel__mini">
+                <span class="preview-panel__mini-label">最近专题</span>
+                <strong>Site Foundations</strong>
+              </div>
+              <div class="preview-panel__mini">
+                <span class="preview-panel__mini-label">X物工作室</span>
+                <strong>探索未知</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Latest Writing ===== -->
+    <section class="section">
+      <div class="section-heading">
+        <div>
+          <p class="section-heading__eyebrow">Latest Writing</p>
+          <h2 class="section-heading__title">从最新的笔记开始</h2>
+        </div>
+        <a class="section-heading__link" href={ROUTES.blog}>
+          全部文章
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <div class="story-grid">
+        {homepage.latestPosts.map((post, index) => (
+          <a
+            class:list={[
+              'card',
+              'card--clickable',
+              'story-card',
+              { 'story-card--lead': index === 0, 'story-card--supporting': index > 0 },
+            ]}
+            href={`${ROUTES.blog}/${post.id}/`}
+          >
+            <div class="story-card__frame">
+              <p class="story-card__label">{index === 0 ? '精选' : '新发布'}</p>
+              <div class="card__title story-card__title">{post.data.title}</div>
+              <p class="card__desc story-card__desc">{post.data.summary ?? post.data.description}</p>
+              <div class="card__meta">
+                <span class="badge">
+                  <time datetime={post.data.pubDate.toISOString()}>{post.data.pubDate.toLocaleDateString('en-CA')}</time>
+                </span>
+                {(post.data.tags ?? []).slice(0, 2).map((tag) => (
+                  <span class="badge">{tag}</span>
+                ))}
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- ===== Ongoing Series ===== -->
+    <section class="section section--compact">
+      <div class="section-heading">
+        <div>
+          <p class="section-heading__eyebrow">Ongoing Series</p>
+          <h2 class="section-heading__title">值得关注的长期专题</h2>
+        </div>
+        <a class="section-heading__link" href={ROUTES.series}>
+          全部专题
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <div class="series-grid series-grid--homepage">
+        {homepage.series.map((series) => (
+          <a class="card card--clickable card--compact series-teaser" href={`${ROUTES.series}/${series.slug}/`}>
+            <div class="series-teaser__topline">
+              <span class="series-teaser__label">Series</span>
+              <span class="series-teaser__count">{series.count} posts</span>
+            </div>
+            <div class="card__title">{series.title}</div>
+            <p class="card__desc">{series.description}</p>
+            <div class="card__meta">
+              <span class="badge">最新: {series.latestPost.data.title}</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- ===== Featured Project + Quick Links ===== -->
+    <section class="section">
+      <div class="section-heading">
+        <div>
+          <p class="section-heading__eyebrow">Featured Projects</p>
+          <h2 class="section-heading__title">深入探索最近的构建</h2>
+        </div>
+        <a class="section-heading__link" href={ROUTES.projects}>
+          全部项目
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      {
+        homepage.featuredProjects.map((project) => (
+          <a class="card card--clickable card--feature" href={`${ROUTES.projects}/${project.id}/`}>
+            <div class="card__title">{project.data.title}</div>
+            <p class="card__desc">{project.data.description}</p>
+            <div class="card__meta">
+              {project.data.status && <span class="badge">{project.data.status}</span>}
+              {project.data.demoSlug && <span class="badge badge--accent">Demo ready</span>}
+              {project.data.demoUrl && <span class="badge badge--accent">在线体验</span>}
+              {(project.data.stack ?? []).slice(0, 3).map((item) => (
+                <span class="badge">{item}</span>
+              ))}
+            </div>
+          </a>
+        ))
+      }
+
+      <div class="home-links" style="margin-top: var(--space-6);">
+        <a class="card card--clickable card--compact" href={ROUTES.demos}>
+          <div class="card__title">Demos</div>
+          <p class="card__desc">Interactive routes for projects ready to explore.</p>
+        </a>
+        <a class="card card--clickable card--compact" href={ROUTES.search}>
+          <div class="card__title">Search</div>
+          <p class="card__desc">Filter writing, series, projects, and demos.</p>
+        </a>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

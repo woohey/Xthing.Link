@@ -1,0 +1,131 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { describePublishingMeta, findRelatedProjectsForPost, getTocItems, slugifySegment } from '../../lib/content-hub.js';
+import { ROUTES } from '../../lib/routes';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => data.draft !== true);
+  const projects = await getCollection('projects');
+  return posts.map((post) => ({
+    params: { id: post.id },
+    props: { post, relatedProjects: findRelatedProjectsForPost(post, projects) },
+  }));
+}
+
+const { post, relatedProjects } = Astro.props;
+const { Content, headings } = await render(post);
+const { title, description, pubDate, updatedDate, tags = [], series } = post.data;
+const publishingMeta = describePublishingMeta(post);
+const tocItems = getTocItems(headings);
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="prose prose--wide article-page">
+    <p class="muted" style="margin-bottom: 0.25rem;"><a href={ROUTES.blog}>← Writing</a></p>
+    <header class="article-hero">
+      <div class="article-hero__main">
+        <p class="soft-pill">Essay</p>
+        <h1 class="page-title">{title}</h1>
+        <p class="page-subtitle">{description}</p>
+        <p class="muted">
+          Published <time datetime={pubDate.toISOString()}>{pubDate.toLocaleDateString('en-CA')}</time>
+          {updatedDate && <> · Updated <time datetime={updatedDate.toISOString()}>{updatedDate.toLocaleDateString('en-CA')}</time></>}
+        </p>
+        <div class="card__meta" style="margin: 0.35rem 0 0;">
+          {series && <a class="badge badge--accent" href={`${ROUTES.series}/${slugifySegment(series)}/`}>{series}</a>}
+          {tags.map((tag) => <span class="badge">{tag}</span>)}
+        </div>
+      </div>
+      <aside class="article-sidecard">
+        <div class="article-sidecard__section">
+          <p class="article-sidecard__label">Publishing trail</p>
+          <div class="article-sidecard__rows">
+            {publishingMeta.sourceLabel && <div class="article-sidecard__row"><span>Source</span><strong>{publishingMeta.sourceLabel}</strong></div>}
+            {publishingMeta.statusLabel && <div class="article-sidecard__row"><span>Status</span><strong>{publishingMeta.statusLabel}</strong></div>}
+            {publishingMeta.platforms.length > 0 && (
+              <div class="article-sidecard__platforms">
+                <span class="article-sidecard__subhead">Syndicated to</span>
+                <div class="card__meta">
+                  {publishingMeta.platforms.map((platform) => <a class="badge badge--accent" href={platform.url}>{platform.name}</a>)}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </aside>
+    </header>
+    {tocItems.length > 0 && (
+      <details class="article-toc-drawer">
+        <summary class="article-toc-drawer__summary">
+          <span class="article-toc-drawer__eyebrow">Content</span>
+        </summary>
+        <nav aria-label="Table of contents" class="article-toc article-toc--drawer">
+          <ul class="article-toc__list">
+            {tocItems.map((item) => (
+              <li class:list={['article-toc__item', { 'article-toc__item--nested': item.depth === 3 }]}>
+                <a href={`#${item.slug}`} data-toc-link={item.slug}>{item.text}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </details>
+    )}
+    <div class="article-body"><Content /></div>
+    {relatedProjects.length > 0 && (
+      <section class="section">
+        <h2>Related projects</h2>
+        <div class="bento-grid">
+          {relatedProjects.map((project) => (
+            <a class="card card--clickable" href={`${ROUTES.projects}/${project.id}/`}>
+              <div class="card__title">{project.data.title}</div>
+              <p class="card__desc">{project.data.description}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+  </article>
+</BaseLayout>
+
+<script define:vars={{ tocItems }}>
+  const tocLinks = Array.from(document.querySelectorAll('[data-toc-link]'));
+  const drawer = document.querySelector('.article-toc-drawer');
+
+  if (drawer && tocItems.length > 0 && tocLinks.length > 0) {
+    const headings = tocItems
+      .map((item) => document.getElementById(item.slug))
+      .filter(Boolean);
+
+    const setActive = (id) => {
+      for (const link of tocLinks) {
+        link.classList.toggle('is-active', link.dataset.tocLink === id);
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+        if (visible[0]?.target?.id) {
+          setActive(visible[0].target.id);
+        }
+      },
+      {
+        rootMargin: '-20% 0px -65% 0px',
+        threshold: [0, 0.2, 0.6, 1],
+      },
+    );
+
+    for (const heading of headings) {
+      observer.observe(heading);
+    }
+
+    const firstHeading = headings[0];
+    if (firstHeading?.id) {
+      setActive(firstHeading.id);
+    }
+  }
+</script>

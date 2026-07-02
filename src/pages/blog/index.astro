@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { ROUTES } from '../../lib/routes';
+
+const posts = (await getCollection('blog', ({ data }) => data.draft !== true)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<BaseLayout title="Writing" description="Articles and technical notes on Xthing.Link.">
+  <main class="prose prose--wide">
+    <section class="page-intro page-intro--editorial">
+      <p class="soft-pill">Notes, threads, and build logs</p>
+      <h1 class="page-title">Writing</h1>
+      <p class="page-subtitle">Longer technical threads, build notes, and quieter experiments organized like an editorial catalog.</p>
+    </section>
+    <section class="writing-catalog">
+      {posts[0] && (
+        <a class="catalog-feature" href={`${ROUTES.blog}/${posts[0].id}/`}>
+          <div class="catalog-feature__meta">
+            <span class="catalog-feature__eyebrow">Lead story</span>
+            <time datetime={posts[0].data.pubDate.toISOString()}>{posts[0].data.pubDate.toLocaleDateString('en-CA')}</time>
+          </div>
+          <div class="catalog-feature__title">{posts[0].data.title}</div>
+          <p class="catalog-feature__summary">{posts[0].data.summary ?? posts[0].data.description}</p>
+          <div class="card__meta">
+            {posts[0].data.series && <span class="badge badge--accent">{posts[0].data.series}</span>}
+            {(posts[0].data.tags ?? []).slice(0, 3).map((tag) => (
+              <span class="badge">{tag}</span>
+            ))}
+          </div>
+        </a>
+      )}
+      <div class="writing-directory">
+        <div class="writing-directory__head">
+          <span class="writing-directory__head-label writing-directory__head-label--index">Index</span>
+          <span class="writing-directory__head-label writing-directory__head-label--published">Published</span>
+          <span class="writing-directory__head-label writing-directory__head-label--title">Writing and technical threads</span>
+        </div>
+        {posts.slice(1).map((post, index) => (
+          <a class="directory-entry" href={`${ROUTES.blog}/${post.id}/`}>
+            <div class="directory-entry__index">{String(index + 2).padStart(2, '0')}</div>
+            <div class="directory-entry__date">
+              <time datetime={post.data.pubDate.toISOString()}>{post.data.pubDate.toLocaleDateString('en-CA')}</time>
+            </div>
+            <div class="directory-entry__content">
+              <div class="directory-entry__title-row">
+                <div class="directory-entry__title">{post.data.title}</div>
+                {post.data.series && <span class="badge badge--accent">{post.data.series}</span>}
+              </div>
+              <p class="directory-entry__summary">{post.data.summary ?? post.data.description}</p>
+              <div class="card__meta">
+                {(post.data.tags ?? []).slice(0, 3).map((tag) => (
+                  <span class="badge">{tag}</span>
+                ))}
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  </main>
+</BaseLayout>

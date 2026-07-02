@@ -1,0 +1,25 @@
+{
+  "device_id": "collar_001",
+  "date": "2026-04-19",
+  "points": [
+    { "latitude": 31.2299, "longitude": 121.4728, "speed": 0.2, "recorded_at": "2026-04-19T06:00:00.000Z" },
+    { "latitude": 31.2302, "longitude": 121.4732, "speed": 0.5, "recorded_at": "2026-04-19T08:15:00.000Z" },
+    { "latitude": 31.2305, "longitude": 121.4738, "speed": 0.9, "recorded_at": "2026-04-19T10:30:00.000Z" },
+    { "latitude": 31.2308, "longitude": 121.4744, "speed": 1.0, "recorded_at": "2026-04-19T12:00:00.000Z" },
+    { "latitude": 31.231, "longitude": 121.475, "speed": 0.8, "recorded_at": "2026-04-19T13:45:00.000Z" },
+    { "latitude": 31.2307, "longitude": 121.4755, "speed": 0.6, "recorded_at": "2026-04-19T15:00:00.000Z" },
+    { "latitude": 31.2304, "longitude": 121.4758, "speed": 0.4, "recorded_at": "2026-04-19T16:20:00.000Z" },
+    { "latitude": 31.2302, "longitude": 121.4753, "speed": 0.5, "recorded_at": "2026-04-19T17:40:00.000Z" },
+    { "latitude": 31.2301, "longitude": 121.4748, "speed": 0.6, "recorded_at": "2026-04-19T18:55:00.000Z" },
+    { "latitude": 31.23005, "longitude": 121.4742, "speed": 0.4, "recorded_at": "2026-04-19T20:10:00.000Z" },
+    { "latitude": 31.2301, "longitude": 121.4737, "speed": 0.2, "recorded_at": "2026-04-19T21:25:00.000Z" },
+    { "latitude": 31.23015, "longitude": 121.4735, "speed": 0.1, "recorded_at": "2026-04-19T22:40:00.000Z" }
+  ],
+  "summary": {
+    "total_distance_meters": 1920,
+    "max_speed_mps": 1.0,
+    "avg_speed_mps": 0.52,
+    "moving_time_minutes": 180,
+    "stop_time_minutes": 230
+  }
+}

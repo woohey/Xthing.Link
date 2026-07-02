@@ -1,0 +1,35 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { collectSeriesSummaries } from '../../lib/content-hub.js';
+import { ROUTES } from '../../lib/routes';
+
+const posts = await getCollection('blog', ({ data }) => data.draft !== true);
+const seriesList = collectSeriesSummaries(posts);
+---
+
+<BaseLayout title="Series" description="Series index on Xthing.Link.">
+  <main class="prose prose--wide">
+    <section class="page-intro page-intro--editorial">
+      <p class="soft-pill">Series are the organizing layer</p>
+      <h1 class="page-title">Series</h1>
+      <p class="page-subtitle">A theme only becomes a series when it has enough momentum to justify sustained follow-up.</p>
+    </section>
+    <div class="series-showcase">
+      {seriesList.map((series) => (
+        <a class="series-showcase__item" href={`${ROUTES.series}/${series.slug}/`}>
+          <div class="series-showcase__header">
+            <span class="series-showcase__label">Research thread</span>
+            <span class="series-showcase__count">{series.count} posts</span>
+          </div>
+          <div class="series-showcase__title">{series.title}</div>
+          <p class="series-showcase__summary">{series.description}</p>
+          <div class="series-showcase__footer">
+            <span>Latest update</span>
+            <strong>{series.latestPost.data.pubDate.toLocaleDateString('en-CA')}</strong>
+          </div>
+        </a>
+      ))}
+    </div>
+  </main>
+</BaseLayout>

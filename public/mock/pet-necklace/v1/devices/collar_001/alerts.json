@@ -1,0 +1,40 @@
+{
+  "alerts": [
+    {
+      "id": "alt_20260419_1",
+      "device_id": "collar_001",
+      "alert_type": "geofence_exit",
+      "severity": "warning",
+      "message": "Left zone: Home",
+      "latitude": 31.2289,
+      "longitude": 121.4712,
+      "geofence_id": "gf_home",
+      "geofence_name": "Home",
+      "is_read": true,
+      "created_at": "2026-04-19T09:12:00.000Z"
+    },
+    {
+      "id": "alt_20260420_1",
+      "device_id": "collar_001",
+      "alert_type": "low_battery",
+      "severity": "info",
+      "message": "Battery below 20% (simulated threshold)",
+      "is_read": false,
+      "created_at": "2026-04-20T06:30:00.000Z"
+    },
+    {
+      "id": "alt_20260420_2",
+      "device_id": "collar_001",
+      "alert_type": "geofence_enter",
+      "severity": "info",
+      "message": "Entered zone: Park",
+      "latitude": 31.2315,
+      "longitude": 121.4755,
+      "geofence_id": "gf_park",
+      "geofence_name": "Park",
+      "is_read": false,
+      "created_at": "2026-04-20T07:45:00.000Z"
+    }
+  ],
+  "total": 3
+}

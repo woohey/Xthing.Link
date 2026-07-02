@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getAllSearchEntries } from '../lib/search-index';
+
+const entries = await getAllSearchEntries();
+const initialQuery = Astro.url.searchParams.get('q') ?? '';
+---
+
+<BaseLayout title="Search" description="Search pages and content across Xthing.Link.">
+  <main class="prose">
+    <h1 class="page-title">Search</h1>
+    <p class="page-subtitle">Filter pages, series, projects, demos, and writing by keyword.</p>
+    <label class="search__label">
+      <span class="sr-only">Query</span>
+      <input class="search__input" type="search" name="q" id="search-q" placeholder="Search the site…" autocomplete="off" value={initialQuery} />
+    </label>
+    <ul class="search__results" id="search-results" role="list"></ul>
+    <p class="search__empty muted" id="search-empty" hidden>No matching results.</p>
+  </main>
+</BaseLayout>
+
+<script define:vars={{ entries, initialQuery }}>
+  const input = document.getElementById('search-q');
+  const list = document.getElementById('search-results');
+  const empty = document.getElementById('search-empty');
+  function normalize(text) { return text.toLowerCase().trim(); }
+  function match(query, item) {
+    if (!query) return true;
+    const q = normalize(query);
+    const blob = normalize([item.title, item.description, item.keywords ?? ''].join(' '));
+    return blob.includes(q);
+  }
+  function render(query) {
+    const filtered = entries.filter((item) => match(query, item));
+    list.innerHTML = '';
+    if (filtered.length === 0) { empty.hidden = false; return; }
+    empty.hidden = true;
+    for (const item of filtered) {
+      const li = document.createElement('li');
+      li.className = 'search__item';
+      const a = document.createElement('a');
+      a.className = 'search__link';
+      a.href = item.href;
+      a.textContent = item.title;
+      const span = document.createElement('span');
+      span.className = 'search__desc muted';
+      span.textContent = item.description ? ` — ${item.description}` : '';
+      li.append(a, span);
+      list.append(li);
+    }
+  }
+  if (input && list && empty) {
+    render(initialQuery);
+    input.addEventListener('input', () => render(input.value));
+  }
+</script>

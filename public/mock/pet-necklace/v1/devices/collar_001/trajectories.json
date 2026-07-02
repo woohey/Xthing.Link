@@ -1,0 +1,17 @@
+{
+  "device_id": "collar_001",
+  "trajectories": [
+    {
+      "date": "2026-04-20",
+      "points_count": 18,
+      "total_distance_meters": 2850,
+      "duration_minutes": 380
+    },
+    {
+      "date": "2026-04-19",
+      "points_count": 12,
+      "total_distance_meters": 1920,
+      "duration_minutes": 410
+    }
+  ]
+}

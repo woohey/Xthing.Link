@@ -1,0 +1,33 @@
+{
+  "geofences": [
+    {
+      "id": "gf_home",
+      "device_id": "collar_001",
+      "name": "Home",
+      "fence_type": "circle",
+      "is_active": true,
+      "center_lat": 31.2304,
+      "center_lng": 121.4737,
+      "radius_meters": 140
+    },
+    {
+      "id": "gf_park",
+      "device_id": "collar_001",
+      "name": "Park",
+      "fence_type": "polygon",
+      "is_active": true,
+      "boundary": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [121.4748, 31.2298],
+            [121.4765, 31.2298],
+            [121.4765, 31.2312],
+            [121.4748, 31.2312],
+            [121.4748, 31.2298]
+          ]
+        ]
+      }
+    }
+  ]
+}

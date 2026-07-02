@@ -1,0 +1,30 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { collectSeriesSummaries } from '../../lib/content-hub.js';
+import { ROUTES } from '../../lib/routes';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => data.draft !== true);
+  const seriesList = collectSeriesSummaries(posts);
+  return seriesList.map((series) => ({ params: { series: series.slug }, props: { series } }));
+}
+
+const { series } = Astro.props;
+---
+
+<BaseLayout title={series.title} description={series.description}>
+  <main class="prose prose--wide">
+    <p class="muted" style="margin-bottom: 0.25rem;"><a href={ROUTES.series}>← Series</a></p>
+    <h1 class="page-title">{series.title}</h1>
+    <p class="page-subtitle">{series.description}</p>
+    <div class="bento-grid">
+      {series.posts.map((post) => (
+        <a class="card card--clickable" href={`${ROUTES.blog}/${post.id}/`}>
+          <div class="card__title">{post.data.title}</div>
+          <p class="card__desc">{post.data.summary ?? post.data.description}</p>
+        </a>
+      ))}
+    </div>
+  </main>
+</BaseLayout>

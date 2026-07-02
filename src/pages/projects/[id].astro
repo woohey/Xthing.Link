@@ -1,0 +1,60 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { findRelatedPostsForProject } from '../../lib/content-hub.js';
+import { ROUTES } from '../../lib/routes';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  const posts = await getCollection('blog', ({ data }) => data.draft !== true);
+  return projects.map((entry) => ({
+    params: { id: entry.id },
+    props: { entry, relatedPosts: findRelatedPostsForProject(entry, posts) },
+  }));
+}
+
+const { entry, relatedPosts } = Astro.props;
+const { Content } = await render(entry);
+const { title, description, status, demoSlug, stack = [], repoUrl, startedAt, updatedAt } = entry.data;
+const demoHref = demoSlug ? `${ROUTES.demos}/${demoSlug}/` : null;
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="prose prose--wide article-page">
+    <p class="muted" style="margin-bottom: 0.25rem;"><a href={ROUTES.projects}>← Projects</a></p>
+    <header class="article-hero">
+      <div class="article-hero__main">
+        <p class="soft-pill">Project archive</p>
+        <h1 class="page-title">{title}</h1>
+        <p class="page-subtitle">{description}</p>
+        {status && <p class="muted">Status: {status}</p>}
+        <div class="card__meta" style="margin: 0.35rem 0 0;">
+          {stack.map((item) => <span class="badge">{item}</span>)}
+        </div>
+      </div>
+      <aside class="article-sidecard">
+        <p class="article-sidecard__label">Project details</p>
+        <div class="article-sidecard__rows">
+          {demoHref && <div class="article-sidecard__row"><span>Demo</span><a href={demoHref}>Open demo</a></div>}
+          {repoUrl && <div class="article-sidecard__row"><span>Repo</span><a href={repoUrl}>Open repository</a></div>}
+          {startedAt && <div class="article-sidecard__row"><span>Started</span><strong>{startedAt.toLocaleDateString('en-CA')}</strong></div>}
+          {updatedAt && <div class="article-sidecard__row"><span>Updated</span><strong>{updatedAt.toLocaleDateString('en-CA')}</strong></div>}
+        </div>
+      </aside>
+    </header>
+    <div class="article-body"><Content /></div>
+    {relatedPosts.length > 0 && (
+      <section class="section">
+        <h2>Related writing</h2>
+        <div class="bento-grid">
+          {relatedPosts.map((post) => (
+            <a class="card card--clickable" href={`${ROUTES.blog}/${post.id}/`}>
+              <div class="card__title">{post.data.title}</div>
+              <p class="card__desc">{post.data.summary ?? post.data.description}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+  </article>
+</BaseLayout>

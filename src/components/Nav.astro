@@ -1,0 +1,182 @@
+---
+import { ROUTES } from '../lib/routes';
+
+const pathname = Astro.url.pathname;
+
+type NavItem = { href: string; label: string; isActive: (path: string) => boolean };
+
+const items: NavItem[] = [
+  {
+    href: ROUTES.home,
+    label: 'Home',
+    isActive: (p) => p === ROUTES.home || p === '',
+  },
+  {
+    href: ROUTES.blog,
+    label: 'Writing',
+    isActive: (p) => p === ROUTES.blog || p.startsWith(`${ROUTES.blog}/`),
+  },
+  {
+    href: ROUTES.series,
+    label: 'Series',
+    isActive: (p) => p === ROUTES.series || p.startsWith(`${ROUTES.series}/`),
+  },
+  {
+    href: ROUTES.projects,
+    label: 'Projects',
+    isActive: (p) => p === ROUTES.projects || p.startsWith(`${ROUTES.projects}/`),
+  },
+  {
+    href: ROUTES.demos,
+    label: 'Demos',
+    isActive: (p) => p === ROUTES.demos || p.startsWith(`${ROUTES.demos}/`),
+  },
+  {
+    href: ROUTES.about,
+    label: 'About',
+    isActive: (p) => p === ROUTES.about,
+  },
+  {
+    href: ROUTES.search,
+    label: 'Search',
+    isActive: (p) => p === ROUTES.search,
+  },
+];
+---
+
+<nav class="site-nav" aria-label="Primary">
+  <div class="site-nav__inner">
+    <a class="site-nav__brand" href={ROUTES.home} aria-label="xthing.link home">
+      <span class="site-nav__brand-name">xthing</span><span class="site-nav__brand-tld">.link</span>
+    </a>
+
+    <ul class="site-nav__list">
+      {
+        items.map(({ href, label, isActive }) => {
+          const active = isActive(pathname);
+          return (
+            <li>
+              <a href={href} class:list={[{ 'is-active': active }]} {...(active ? { 'aria-current': 'page' } : {})}>
+                {label}
+              </a>
+            </li>
+          );
+        })
+      }
+      <li>
+        <a href="/rss.xml" type="application/rss+xml" class="rss-link">
+          RSS
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<style>
+  .site-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+
+    border-bottom: none;
+    margin: 0 calc(-1 * var(--gutter)) 0;
+    padding: 0.85rem var(--gutter);
+
+    background: rgba(240, 245, 246, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .site-nav__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 0.7rem 0.85rem;
+  }
+
+  .site-nav__brand {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    text-decoration: none;
+    font-family: var(--font-brand);
+    font-weight: 500;
+    font-size: 1.125rem;
+    color: var(--fg);
+    letter-spacing: -0.02em;
+  }
+
+  .site-nav__brand-name {
+    color: var(--fg);
+  }
+
+  .site-nav__brand-tld {
+    color: var(--cyan-300);
+  }
+
+  .site-nav__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .site-nav a {
+    color: var(--fg);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .site-nav a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+
+  .site-nav a.is-active {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .rss-link {
+    font-weight: 400;
+    opacity: 0.85;
+  }
+
+  .site-nav a {
+    border-radius: 10px;
+    padding: 0.45rem 0.65rem;
+  }
+
+  .site-nav a:hover {
+    background: color-mix(in oklab, var(--accent) 10%, transparent);
+    text-decoration: none;
+  }
+
+  @media (max-width: 420px) {
+    .site-nav {
+      padding: 0.75rem calc(0.6 * var(--gutter));
+    }
+
+    .site-nav__inner {
+      align-items: flex-start;
+      flex-direction: column;
+      flex-wrap: wrap;
+    }
+
+    .site-nav__list {
+      gap: 0.5rem 0.75rem;
+      justify-content: flex-start;
+    }
+
+    .site-nav a {
+      padding: 0.38rem 0.5rem;
+    }
+  }
+</style>

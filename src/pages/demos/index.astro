@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { ROUTES } from '../../lib/routes';
+
+const projects = await getCollection('projects', ({ data }) => Boolean(data.demoSlug));
+---
+
+<BaseLayout title="Demos" description="Interactive demo routes on Xthing.Link.">
+  <main class="prose">
+    <h1 class="page-title">Demos</h1>
+    <p class="page-subtitle">Interactive demos show the result, but the full narrative still lives in the writing and project pages.</p>
+    <div class="bento-grid">
+      {projects.map((p) => (
+        <a class="card card--clickable" href={`${ROUTES.demos}/${p.data.demoSlug}/`}>
+          <div class="card__title">{p.data.title}</div>
+          <p class="card__desc">{p.data.description}</p>
+        </a>
+      ))}
+    </div>
+  </main>
+</BaseLayout>

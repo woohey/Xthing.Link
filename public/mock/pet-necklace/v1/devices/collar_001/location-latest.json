@@ -1,0 +1,11 @@
+{
+  "device_id": "collar_001",
+  "latitude": 31.2304,
+  "longitude": 121.4737,
+  "altitude": 12.5,
+  "speed": 0.2,
+  "battery_level": 87,
+  "signal_strength": -72,
+  "recorded_at": "2026-04-20T07:58:00.000Z",
+  "received_at": "2026-04-20T07:58:12.000Z"
+}

@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { ROUTES } from '../../../lib/routes';
+import PetNecklaceDashboard from '../../../components/PetNecklaceDashboard';
+---
+
+<BaseLayout title="宠物项圈控制台" description="PetNecklace 演示：地图、轨迹回放、电子围栏与告警（模拟或线上 API）。">
+  <main class="prose prose--wide" lang="zh-Hans">
+    <p class="muted" style="margin-bottom: 0.25rem;"><a href={ROUTES.demos}>← 演示列表</a></p>
+    <h1>宠物项圈控制台</h1>
+    <p class="muted">
+      数据来自 PetNecklace HTTP API 约定。默认加载站内静态模拟 JSON；接入真实服务时请设置
+      <code>PUBLIC_PET_API_MODE=live</code> 与 <code>PUBLIC_PET_API_BASE</code>（后端根地址，无尾斜杠）。
+    </p>
+    <p>
+      <a href={`${ROUTES.projects}/pet-necklace/`}>项目页</a>
+      · 接口字段说明：<code>docs/plans/pet-necklace-api-contract.md</code>
+      · 给设备/服务端团队的对接总览：<code>docs/plans/pet-necklace-对接开发材料.md</code>
+    </p>
+
+    <PetNecklaceDashboard client:only="react">
+      <p class="muted" slot="fallback">正在加载控制台…</p>
+    </PetNecklaceDashboard>
+  </main>
+</BaseLayout>

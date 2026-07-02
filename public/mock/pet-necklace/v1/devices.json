@@ -1,0 +1,10 @@
+{
+  "devices": [
+    {
+      "device_id": "collar_001",
+      "name": "Collar 001",
+      "pet_name": "Mochi",
+      "updated_at": "2026-04-20T08:00:00.000Z"
+    }
+  ]
+}

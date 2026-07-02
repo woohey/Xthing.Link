@@ -1,0 +1,31 @@
+{
+  "device_id": "collar_001",
+  "date": "2026-04-20",
+  "points": [
+    { "latitude": 31.23035, "longitude": 121.4735, "speed": 0.1, "recorded_at": "2026-04-20T00:10:00.000Z" },
+    { "latitude": 31.23055, "longitude": 121.47385, "speed": 0.4, "recorded_at": "2026-04-20T01:20:00.000Z" },
+    { "latitude": 31.23075, "longitude": 121.4742, "speed": 0.6, "recorded_at": "2026-04-20T02:40:00.000Z" },
+    { "latitude": 31.23095, "longitude": 121.47455, "speed": 0.8, "recorded_at": "2026-04-20T04:00:00.000Z" },
+    { "latitude": 31.23115, "longitude": 121.4749, "speed": 1.0, "recorded_at": "2026-04-20T05:15:00.000Z" },
+    { "latitude": 31.23135, "longitude": 121.47525, "speed": 1.1, "recorded_at": "2026-04-20T06:30:00.000Z" },
+    { "latitude": 31.23145, "longitude": 121.4756, "speed": 0.9, "recorded_at": "2026-04-20T07:45:00.000Z" },
+    { "latitude": 31.2314, "longitude": 121.476, "speed": 0.7, "recorded_at": "2026-04-20T08:50:00.000Z" },
+    { "latitude": 31.2312, "longitude": 121.47635, "speed": 0.5, "recorded_at": "2026-04-20T10:00:00.000Z" },
+    { "latitude": 31.23095, "longitude": 121.4765, "speed": 0.4, "recorded_at": "2026-04-20T11:10:00.000Z" },
+    { "latitude": 31.23065, "longitude": 121.47635, "speed": 0.6, "recorded_at": "2026-04-20T12:25:00.000Z" },
+    { "latitude": 31.2304, "longitude": 121.476, "speed": 0.8, "recorded_at": "2026-04-20T13:40:00.000Z" },
+    { "latitude": 31.23025, "longitude": 121.47555, "speed": 0.7, "recorded_at": "2026-04-20T14:55:00.000Z" },
+    { "latitude": 31.2302, "longitude": 121.47505, "speed": 0.5, "recorded_at": "2026-04-20T16:05:00.000Z" },
+    { "latitude": 31.23025, "longitude": 121.4745, "speed": 0.4, "recorded_at": "2026-04-20T17:15:00.000Z" },
+    { "latitude": 31.23035, "longitude": 121.474, "speed": 0.3, "recorded_at": "2026-04-20T18:25:00.000Z" },
+    { "latitude": 31.23038, "longitude": 121.47365, "speed": 0.2, "recorded_at": "2026-04-20T19:35:00.000Z" },
+    { "latitude": 31.2304, "longitude": 121.4737, "speed": 0.1, "recorded_at": "2026-04-20T20:40:00.000Z" }
+  ],
+  "summary": {
+    "total_distance_meters": 2850,
+    "max_speed_mps": 1.1,
+    "avg_speed_mps": 0.55,
+    "moving_time_minutes": 220,
+    "stop_time_minutes": 160
+  }
+}

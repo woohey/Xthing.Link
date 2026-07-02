@@ -1,0 +1,46 @@
+---
+import Nav from '../components/Nav.astro';
+import '../styles/global.css';
+import { SITE } from '../lib/site';
+import { ROUTES } from '../lib/routes';
+
+type Props = {
+  title: string;
+  description?: string;
+};
+
+const { title, description = SITE.description } = Astro.props;
+const fullTitle = title === SITE.name ? title : `${title} · ${SITE.name}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <title>{fullTitle}</title>
+    <link rel="icon" type="image/png" sizes="512x512" href="/brand/xthing-link-icon-v1.png" />
+    <link rel="apple-touch-icon" href="/brand/xthing-link-icon-v1.png" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={SITE.name}
+      href={new URL(ROUTES.rss, Astro.site ?? SITE.url)}
+    />
+  </head>
+  <body>
+    <div class="shell">
+      <a class="skip-link" href="#main">Skip to content</a>
+      <Nav />
+      <div class="page" id="main">
+        <slot />
+      </div>
+      <footer class="site-footer" aria-label="Site footer">
+        <p class="site-footer__title">xthing<span class="site-footer__tld">.link</span> <span class="site-footer__year">© 2026</span></p>
+        <p class="site-footer__tagline">X 是未知，物是万物。链接，是我们选择的方式。Things worth linking.</p>
+      </footer>
+    </div>
+  </body>
+</html>
