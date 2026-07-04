@@ -210,7 +210,7 @@ async function cleanDir(dir) {
 
 async function main() {
   console.log('[sync] Fetching posts from PocketBase...');
-  const posts = await fetchAll('posts', "status='published'");
+  const posts = await fetchAll('posts', 'status="published"');
   console.log(`[sync]   → ${posts.length} published posts`);
 
   console.log('[sync] Fetching projects from PocketBase...');
