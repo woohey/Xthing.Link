@@ -10,7 +10,7 @@
  *   3. Exit 0 on success, non-zero on failure (so astro build aborts)
  */
 
-import { readdir, unlink, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, unlink, writeFile } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -218,6 +218,10 @@ async function main() {
   console.log(`[sync]   → ${projects.length} projects`);
 
   // Clean and regenerate
+  console.log('[sync] Ensuring content directories exist...');
+  await mkdir(BLOG_DIR, { recursive: true });
+  await mkdir(PROJECTS_DIR, { recursive: true });
+
   console.log('[sync] Cleaning content directories...');
   await cleanDir(BLOG_DIR);
   await cleanDir(PROJECTS_DIR);
