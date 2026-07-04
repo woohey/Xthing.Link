@@ -37,7 +37,8 @@ const projects = defineCollection({
     title: z.string(),
     description: z.string(),
     status: z.enum(['idea', 'wip', 'shipped']).optional(),
-    demoSlug: z.string().optional(),
+    deployType: z.enum(['static-deployed', 'embedded', 'github-only', 'planned']).optional(),
+    demoSlug: z.string().optional(),  // backward compat: embedded demos
     order: z.number().optional(),
     tags: z.array(z.string()).default([]),
     stack: z.array(z.string()).optional(),

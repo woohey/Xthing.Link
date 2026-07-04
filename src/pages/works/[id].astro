@@ -1,0 +1,106 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { findRelatedPostsForProject } from '../../lib/content-hub.js';
+import { ROUTES } from '../../lib/routes';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  const posts = await getCollection('blog', ({ data }) => data.draft !== true);
+  return projects.map((entry) => ({
+    params: { id: entry.id },
+    props: { entry, relatedPosts: findRelatedPostsForProject(entry, posts) },
+  }));
+}
+
+const { entry, relatedPosts } = Astro.props;
+const { Content } = await render(entry);
+const {
+  title, description, status, deployType,
+  stack = [], repoUrl, demoUrl,
+  startedAt, updatedAt,
+} = entry.data;
+
+function deployLabel(t: string) {
+  switch (t) {
+    case 'static-deployed': return '独立部署';
+    case 'embedded': return '本站嵌入';
+    case 'github-only': return '代码仓库';
+    case 'planned': return '规划中';
+    default: return t;
+  }
+}
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="prose prose--wide article-page">
+    <p class="muted" style="margin-bottom: 0.25rem;">
+      <a href={ROUTES.works}>&larr; Works</a>
+    </p>
+    <header class="article-hero">
+      <div class="article-hero__main">
+        <p class="soft-pill">Works detail</p>
+        <h1 class="page-title">{title}</h1>
+        <p class="page-subtitle">{description}</p>
+        <div class="card__meta" style="margin: 0.5rem 0 0;">
+          {status && <span class="badge">{status}</span>}
+          {deployType && <span class="badge badge--accent">{deployLabel(deployType)}</span>}
+          {stack.map((item: string) => <span class="badge">{item}</span>)}
+        </div>
+      </div>
+      <aside class="article-sidecard">
+        <p class="article-sidecard__label">项目链接</p>
+        <div class="article-sidecard__rows">
+          {demoUrl && (
+            <div class="article-sidecard__row">
+              <span>在线体验</span>
+              <a href={demoUrl} target="_blank" rel="noopener">Open demo</a>
+            </div>
+          )}
+          {repoUrl && (
+            <div class="article-sidecard__row">
+              <span>源码</span>
+              <a href={repoUrl} target="_blank" rel="noopener">Open repository</a>
+            </div>
+          )}
+          {deployType === 'embedded' && (
+            <div class="article-sidecard__row">
+              <span>交互演示</span>
+              <a href={`${ROUTES.demos}/${entry.id}/`}>本站体验</a>
+            </div>
+          )}
+          {startedAt && (
+            <div class="article-sidecard__row">
+              <span>开始</span>
+              <strong>{new Date(startedAt).toLocaleDateString('en-CA')}</strong>
+            </div>
+          )}
+          {updatedAt && (
+            <div class="article-sidecard__row">
+              <span>更新</span>
+              <strong>{new Date(updatedAt).toLocaleDateString('en-CA')}</strong>
+            </div>
+          )}
+        </div>
+      </aside>
+    </header>
+
+    <div class="article-body">
+      <Content />
+    </div>
+
+    {relatedPosts.length > 0 && (
+      <section class="section">
+        <h2>相关文章</h2>
+        <div class="bento-grid">
+          {relatedPosts.map((post: any) => (
+            <a class="card card--clickable" href={`${ROUTES.blog}/${post.id}/`}>
+              <div class="card__title">{post.data.title}</div>
+              <p class="card__desc">{post.data.summary ?? post.data.description}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+  </article>
+</BaseLayout>

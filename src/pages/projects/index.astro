@@ -1,30 +1,14 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
-import { sortProjects } from '../../lib/content-hub.js';
 import { ROUTES } from '../../lib/routes';
-
-const projects = sortProjects(await getCollection('projects'));
+const dest = ROUTES.works;
 ---
-
-<BaseLayout title="Projects" description="Project index on Xthing.Link.">
-  <main class="prose prose--wide">
-    <section class="page-intro page-intro--editorial">
-      <p class="soft-pill">Projects as the evidence layer</p>
-      <h1 class="page-title">Projects</h1>
-      <p class="page-subtitle">These entries carry the work behind the writing, series, and demos rather than acting like a flat gallery wall.</p>
-    </section>
-    <div class="bento-grid">
-      {projects.map((p) => (
-        <a class="card card--clickable" href={`${ROUTES.projects}/${p.id}/`}>
-          <div class="card__title">{p.data.title}</div>
-          <p class="card__desc">{p.data.description}</p>
-          <div class="card__meta">
-            {p.data.status && <span class="badge">{p.data.status}</span>}
-            {p.data.demoSlug && <span class="badge badge--accent">Demo</span>}
-          </div>
-        </a>
-      ))}
-    </div>
-  </main>
-</BaseLayout>
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content={`0;url=${dest}`}>
+  <link rel="canonical" href={dest}>
+  <title>Redirecting to Works...</title>
+</head>
+<body><p>Redirecting to <a href={dest}>Works</a>...</p></body>
+</html>

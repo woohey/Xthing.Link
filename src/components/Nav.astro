@@ -22,14 +22,9 @@ const items: NavItem[] = [
     isActive: (p) => p === ROUTES.series || p.startsWith(`${ROUTES.series}/`),
   },
   {
-    href: ROUTES.projects,
-    label: 'Projects',
-    isActive: (p) => p === ROUTES.projects || p.startsWith(`${ROUTES.projects}/`),
-  },
-  {
-    href: ROUTES.demos,
-    label: 'Demos',
-    isActive: (p) => p === ROUTES.demos || p.startsWith(`${ROUTES.demos}/`),
+    href: ROUTES.works,
+    label: 'Works',
+    isActive: (p) => p === ROUTES.works || p.startsWith(`${ROUTES.works}/`) || p === ROUTES.projects || p === ROUTES.demos || p.startsWith(`${ROUTES.projects}/`) || p.startsWith(`${ROUTES.demos}/`),
   },
   {
     href: ROUTES.about,

@@ -1,0 +1,86 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { sortProjects } from '../../lib/content-hub.js';
+import { ROUTES } from '../../lib/routes';
+
+const projects = sortProjects(await getCollection('projects'));
+
+function deployLabel(t: string) {
+  switch (t) {
+    case 'static-deployed': return '在线体验';
+    case 'embedded': return '交互演示';
+    case 'github-only': return 'GitHub';
+    case 'planned': return '规划中';
+    default: return t;
+  }
+}
+
+function deployLink(p: any) {
+  switch (p.data.deployType) {
+    case 'static-deployed':
+      return p.data.demoUrl || null;
+    case 'embedded':
+      return null;
+    case 'github-only':
+      return p.data.repoUrl || null;
+    default:
+      return null;
+  }
+}
+---
+
+<BaseLayout title="Works" description="Projects, demos, and experiments on Xthing.Link.">
+  <main class="prose prose--wide">
+    <section class="page-intro page-intro--editorial">
+      <p class="soft-pill">Works</p>
+      <h1 class="page-title">项目实验室</h1>
+      <p class="page-subtitle">
+        这里汇集了所有项目与演示。每个条目对应一个独立的构建 —— 有的已在线部署，有的嵌入本站互动，有的还停留在代码仓库阶段。
+      </p>
+    </section>
+
+    <div class="bento-grid">
+      {projects.map((p) => {
+        const dt = p.data.deployType || 'planned';
+        const extLink = deployLink(p);
+        const detailHref = `${ROUTES.works}/${p.id}/`;
+
+        return (
+          <div class="card">
+            <div class="card__title">
+              <a href={detailHref}>{p.data.title}</a>
+            </div>
+            <p class="card__desc">{p.data.description}</p>
+            <div class="card__meta" style="display:flex;flex-wrap:wrap;gap:0.35rem;">
+              {p.data.status && <span class="badge">{p.data.status}</span>}
+              <span class:list={[
+                'badge',
+                { 'badge--accent': dt === 'static-deployed' || dt === 'embedded' },
+                { 'badge--secondary': dt === 'planned' },
+              ]}>
+                {deployLabel(dt)}
+              </span>
+              {(p.data.stack ?? []).slice(0, 3).map((item: string) => (
+                <span class="badge">{item}</span>
+              ))}
+            </div>
+            <div style="margin-top:0.5rem;display:flex;gap:0.75rem;">
+              <a href={detailHref} style="font-size:0.875rem;">详情</a>
+              {extLink && <a href={extLink} style="font-size:0.875rem;" target="_blank" rel="noopener">{dt === 'github-only' ? 'GitHub' : '体验'}</a>}
+              {p.data.repoUrl && dt !== 'github-only' && (
+                <a href={p.data.repoUrl} style="font-size:0.875rem;" target="_blank" rel="noopener">源码</a>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+
+    {projects.length === 0 && (
+      <p class="muted" style="text-align:center;padding:var(--space-8) 0;">
+        暂无项目。在 PocketBase 后台新增项目后，这里会自动展示。
+      </p>
+    )}
+  </main>
+</BaseLayout>

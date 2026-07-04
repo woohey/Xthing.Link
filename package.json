@@ -6,11 +6,13 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
+    "sync": "node scripts/sync-from-pb.mjs",
+    "dev": "npm run sync && astro dev",
+    "build": "npm run sync && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "node --test"
+    "test": "node --test",
+    "webhook": "node scripts/webhook-receiver.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.2",

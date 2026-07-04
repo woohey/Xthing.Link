@@ -28,7 +28,7 @@ const homepage = pickHomepageSections({ posts, projects });
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
               阅读笔记
             </a>
-            <a class="secondary-link--button" href={ROUTES.projects}>
+            <a class="secondary-link--button" href={ROUTES.works}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
               项目实验室
             </a>
@@ -153,33 +153,35 @@ const homepage = pickHomepageSections({ posts, projects });
           <p class="section-heading__eyebrow">Featured Projects</p>
           <h2 class="section-heading__title">深入探索最近的构建</h2>
         </div>
-        <a class="section-heading__link" href={ROUTES.projects}>
+        <a class="section-heading__link" href={ROUTES.works}>
           全部项目
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </a>
       </div>
 
       {
-        homepage.featuredProjects.map((project) => (
-          <a class="card card--clickable card--feature" href={`${ROUTES.projects}/${project.id}/`}>
+        homepage.featuredProjects.map((project) => {
+          const deployBadge = project.data.deployType === 'static-deployed' || project.data.deployType === 'embedded'
+            ? '在线体验' : project.data.deployType === 'github-only' ? 'GitHub' : null;
+          return (
+          <a class="card card--clickable card--feature" href={`${ROUTES.works}/${project.id}/`}>
             <div class="card__title">{project.data.title}</div>
             <p class="card__desc">{project.data.description}</p>
             <div class="card__meta">
               {project.data.status && <span class="badge">{project.data.status}</span>}
-              {project.data.demoSlug && <span class="badge badge--accent">Demo ready</span>}
-              {project.data.demoUrl && <span class="badge badge--accent">在线体验</span>}
+              {deployBadge && <span class="badge badge--accent">{deployBadge}</span>}
               {(project.data.stack ?? []).slice(0, 3).map((item) => (
                 <span class="badge">{item}</span>
               ))}
             </div>
           </a>
-        ))
+        )})
       }
 
       <div class="home-links" style="margin-top: var(--space-6);">
-        <a class="card card--clickable card--compact" href={ROUTES.demos}>
-          <div class="card__title">Demos</div>
-          <p class="card__desc">Interactive routes for projects ready to explore.</p>
+        <a class="card card--clickable card--compact" href={ROUTES.works}>
+          <div class="card__title">Works</div>
+          <p class="card__desc">项目实验室 — 所有构建、演示与实验的总入口。</p>
         </a>
         <a class="card card--clickable card--compact" href={ROUTES.search}>
           <div class="card__title">Search</div>

@@ -1,38 +1,51 @@
-# Xthing.Link 内容工作流
+# Xthing.Link v2 — 内容工作流
 
-## 目标
+## 核心变化
 
-让写作过程尽量简单，同时保持：
-- 一份主稿
-- 网站为完整版本
-- 外部平台便于分发
+v2 将内容从 git 中剥离，PocketBase 成为唯一内容真相源。
 
-## 推荐流程
+| 操作 | v1（现在） | v2（升级后） |
+|------|-----------|-------------|
+| 写文章 | Obsidian | Obsidian |
+| 发布到网站 | 手动复制 .md → git push → 服务器 build | Obsidian 快捷键 → PB → 自动 build |
+| 改文章 | 改 .md → git → build | Obsidian 快捷键 → PB → 自动 build |
+| 管理项目 | 改 .md → git → build | PB Admin UI → build |
+| 跨平台分发 | SyncFlow（未完成） | SyncFlow（以后接入） |
 
-1. 在 Obsidian 中编写原始 Markdown 主稿
-2. 使用统一 frontmatter 整理进入站点内容目录
-3. 在网站上发布完整版本
-4. 针对头条、知乎、小红书等平台生成派生版本
-5. 在文章 metadata 中记录已同步的平台链接
+## 日常操作
+
+### 发布新文章
+1. 在 Obsidian 中写 Markdown
+2. frontmatter 加 `publish: true` / `status: published`
+3. 触发 QuickAdd 宏（快捷键）
+4. 宏将内容 POST 到 PocketBase API
+5. PB webhook 触发服务器 build
+6. 约 30 秒后网站在线
+
+### 修改已有文章
+同上。宏会自动识别是新增还是更新（POST vs PATCH）。
+
+### 管理项目/Works
+在 PB Admin UI (`http://47.99.54.65/_/`) 的 projects collection 中操作。修改后需手动触发 build 或等下次 webhook。
+
+### 本地开发
+```
+npm run dev
+# = npm run sync && astro dev
+```
+sync 脚本从 PB 拉取最新内容 → 写入临时 .md 文件 → Astro dev server 启动。
+
+### 部署到服务器
+改代码（非内容）的场景：
+```
+git push → 服务器 git pull → npm run build
+```
+改内容不需要 git，PB webhook 自动触发 build。
 
 ## 原则
 
-- Obsidian 是唯一主稿源
-- 网站是主站和完整归档
-- 外部平台不做机械复制，而做适配改写
-- 不在第一阶段追求全自动一键同步
-
-## 建议维护的 metadata
-
-- `canonical`
-- `platforms`
-- `source`
-- `status`
-- `summary`
-- `cover`
-
-这些字段主要服务于：
-- 内容管理
-- 多平台分发记录
-- 站内展示
-- 后续自动化扩展
+- PocketBase 是唯一内容真相源
+- `src/content/**/*.md` 是临时产物，gitignored，不要手动编辑
+- Obsidian 是主要写作入口
+- PB Admin UI 是内容审核和管理面板
+- 不在一阶段追求跨平台自动分发（SyncFlow 未完成）

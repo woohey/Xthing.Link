@@ -93,7 +93,7 @@ export function findRelatedProjectsForPost(post, projects) {
     projects.filter((project) => {
       if ((project.data.relatedPosts ?? []).includes(post.id)) return true;
       if (!inferredSeriesSlug) return false;
-      return project.id === inferredSeriesSlug || project.data.demoSlug === inferredSeriesSlug;
+      return project.id === inferredSeriesSlug;
     }),
   );
 }

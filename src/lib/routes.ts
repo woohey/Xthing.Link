@@ -4,10 +4,11 @@
 export const ROUTES = {
   home: '/',
   series: '/series',
-  projects: '/projects',
+  works: '/works',
+  projects: '/projects',  // legacy → redirects to /works
   blog: '/blog',
   about: '/about',
-  demos: '/demos',
+  demos: '/demos',        // legacy → redirects to /works
   search: '/search',
   rss: '/rss.xml',
 } as const;
