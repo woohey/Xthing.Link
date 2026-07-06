@@ -9,3 +9,25 @@
 **What happened:** 方案设计时假设 SyncFlow 已开发完成，将跨平台分发纳入 Phase 3。
 **Why it was wrong:** SyncFlow 实际未完成，不应作为方案的依赖项。
 **Rule:** 验证所有外部依赖的实际状态。不确定的依赖先标记为「以后接入」，不要纳入当前计划。
+
+## 2026-07-04: PocketBase v0.27 schema API 三大坑
+
+### 坑 1: fields vs schema
+**What happened:** PB 创建 collection 的 API，字段列表放在 `"fields"` 键下，不是 `"schema"`。
+**Why it was wrong:** 使用 `"schema"` 时 PB 不报错，但只创建了 `id` 字段，其他字段全部丢弃。18 条数据导入后发现记录只有 4 个 key。
+**Rule:** PocketBase v0.23+ API 字段数组统一用 `"fields"`，不要用 `"schema"`。
+
+### 坑 2: text 字段 max: 0 不是「无限制」
+**What happened:** `max: 0` 在 API response 中返回，但实际 PB 使用内部默认值 5000。3 篇超过 5000 字的文章导入失败。
+**How fixed:** 必须在创建或更新字段时显式设置一个非零大值（如 `max: 200000`）。
+**Rule:** 不要依赖 `max: 0`，长文本字段始终显式设 `max: 200000` 或更大。
+
+### 坑 3: PATCH collection 的 fields 会覆盖整个 schema
+**What happened:** 用 `PATCH /api/collections/posts` 更新 content 字段的 max 值时，`{"fields": [content_field_obj]}` 把整个 schema 替换成了只有 content 一个字段。
+**How fixed:** 创建 collection 时就设好所有字段参数（包括 max），之后不再 PATCH。
+**Rule:** 不要用 PATCH 修改 fields——要么在 Admin UI 手工操作，要么删掉重建。
+
+## 2026-07-04: `gh auth setup-git` 绕过 VPN SSL 拦截
+**What happened:** git push 反复失败 (`Empty reply from server`)，原因是 VPN/代理将 `github.com` DNS 解析到了 `198.18.0.22`（SSL 中间人拦截 IP）。
+**How fixed:** `gh auth setup-git` 配置 gh CLI token 后 push 成功。
+**Rule:** HTTPS git push 报 `Empty reply from server` 时，先用 `curl -v https://github.com` 看 DNS 解析是否正确。被代理拦截就用 `gh auth setup-git`。

@@ -93,9 +93,9 @@ const server = createServer((req, res) => {
       log(`received: ${collection} / ${action}`);
 
       // Only respond to posts collection changes
-      if (collection !== 'posts') {
+      if (collection !== 'posts' && collection !== 'projects') {
         log(`skipped (collection=${collection})`);
-        res.writeHead(200).end(JSON.stringify({ status: 'skipped', reason: 'not posts collection' }));
+        res.writeHead(200).end(JSON.stringify({ status: 'skipped', reason: 'not posts/projects collection' }));
         return;
       }
 

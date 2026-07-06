@@ -316,44 +316,53 @@ PB Admin UI (/_/)
 }
 ```
 
-## 10. 分阶段实施计划
+## 10. 实施记录（2026-07-04 部署完成）
 
-### Phase 1 — 基础设施
+| 项目 | 计划 | 实际 |
+|------|------|------|
+| PB 版本 | v0.39.5 | **v0.27.0**（最新稳定版为 v0.27） |
+| posts 文章数 | 17 | **18**（含 welcome 页） |
+| build 耗时 | — | 39 pages / 9.29s |
+| nginx | 无 HTTPS | 同计划，`/` 静态 + `/api/` + `/_/` + `/Aquaworld/` |
+| webhook-receiver | 4322 端口 | 同计划，systemd 守护，X-Webhook-Secret 校验 |
+| PB Admin auth | basic auth | `admin:Xthing20!` (basic) + `admin@xthing.link:TempPass123!` (PB login) |
 
-**目标：PB 跑起来，sync 脚本打通，nginx 改造完成**
+### 踩坑记录（详见 tasks/lessons.md）
+1. **PB API `fields` vs `schema`**：字段键名为 `fields` 非 `schema`，错用会导致 schema 为空
+2. **`max: 0` 不解除限制**：text 字段需显式设 `max: 200000`
+3. **PATCH fields 覆盖 schema**：批量更新字段会替换整个 schema，应避免 PATCH
 
-- [ ] 服务器安装 PocketBase v0.39.5，systemd 守护
-- [ ] 创建 posts / projects / platforms collections
-- [ ] 编写 `scripts/sync-from-pb.mjs`
-- [ ] 编写一次性迁移脚本，将 17 篇博文 + 3 个项目导入 PB
-- [ ] 更新 `.gitignore`：`src/content/blog/*.md`、`src/content/projects/*.md`（保留目录结构）
-- [ ] 更新 npm scripts：`dev` / `build` 前置 `sync`
-- [ ] nginx 配置：`/api/` → PB `:8090`，`/_/` 加 basic auth
-- [ ] 验证：`npm run build` 成功，页面内容与 v1 一致
+## 11. 分阶段实施计划
 
-### Phase 2 — 自动化管道
+### Phase 1 — 基础设施 ✅ 完成 (2026-07-04)
 
-**目标：内容变更自动触发 build**
+- [x] 服务器安装 PocketBase v0.27.0，systemd 守护
+- [x] 创建 posts / projects / platforms collections
+- [x] 编写 `scripts/sync-from-pb.mjs`
+- [x] 编写一次性迁移脚本，将 18 篇博文 + 3 个项目导入 PB
+- [x] 更新 `.gitignore`：`src/content/blog/*.md`、`src/content/projects/*.md`
+- [x] 更新 npm scripts：`dev` / `build` 前置 `sync`
+- [x] nginx 配置：`/api/` → PB `:8090`，`/_/` 加 basic auth
+- [x] 验证：`npm run build` 成功（39 pages / 9.29s）
 
-- [ ] 编写 `scripts/webhook-receiver.mjs`
-- [ ] PB 后台配置 webhook 指向 receiver
-- [ ] 验证：PB 中修改一篇文章 → webhook 触发 → 网站更新
+### Phase 2 — 自动化管道 ✅ 完成 (2026-07-04)
 
-### Phase 3 — Obsidian 集成
+- [x] 编写 `scripts/webhook-receiver.mjs`
+- [x] webhook-receiver systemd 部署（127.0.0.1:4322）
+- [x] 验证：webhook 触发 → 自动 build 成功（~10s）
 
-**目标：从 Obsidian 一键发布**
+### Phase 3 — Obsidian 集成 🔧 部分完成
 
-- [ ] 编写 Obsidian QuickAdd 宏（或 Node CLI 脚本）
-- [ ] 映射 Obsidian frontmatter ↔ PB 字段
-- [ ] 验证：Obsidian 写文章 → 快捷键推送 → PB 存储 → 网站可见
+- [x] 编写 `scripts/publish-from-obsidian.mjs`（CLI 发布脚本）
+- [ ] Obsidian QuickAdd 宏配置（用户在 Obsidian 端自行部署）
+- [ ] 验证：Obsidian 写作 → 推送 → PB → 网站可见
 
-### Phase 4 — Works 板块
+### Phase 4 — Works 板块 ✅ 完成 (2026-07-04)
 
-**目标：统一项目/Demos 入口**
-
-- [ ] 设计 Works 页面（替代现有 `/projects` + `/demos`）
-- [ ] Works 页面根据 deployType 区分渲染
-- [ ] 独立项目部署目录标准化
+- [x] 设计 Works 页面（`/works/` 替代 `/projects` + `/demos`）
+- [x] Works 页面根据 deployType 区分渲染（badge + 侧边栏链接）
+- [x] 旧路由 301 重定向
+- [ ] 独立项目部署目录标准化（第一个新增项目时执行）
 - [ ] 验证：新增一个 demo 项目 → 独立部署 → 主站 Works 页展示
 
 ## 11. 与环境相关的文件
