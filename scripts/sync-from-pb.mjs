@@ -11,6 +11,7 @@
  */
 
 import { mkdir, readdir, unlink, writeFile } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -21,6 +22,17 @@ const PB_API = `${PB_URL}/api`;
 
 const BLOG_DIR = join(ROOT, 'src', 'content', 'blog');
 const PROJECTS_DIR = join(ROOT, 'src', 'content', 'projects');
+const PROJECT_GIT_PATHS = {
+  'pet-necklace': [
+    'src/pages/demos/pet-necklace',
+    'src/components/PetNecklaceDashboard.tsx',
+    'src/components/PetNecklaceMap.tsx',
+    'src/lib/pet-necklace-api.ts',
+    'public/mock/pet-necklace',
+    'docs/plans/pet-necklace-api-contract.md',
+    'docs/plans/pet-necklace-对接开发材料.md',
+  ],
+};
 
 // ---------------------------------------------------------------------------
 // helpers
@@ -51,6 +63,30 @@ function formatDate(d) {
   const dt = new Date(d);
   if (Number.isNaN(dt.getTime())) return '';
   return dt.toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+function gitLogDate(paths, args) {
+  if (!paths?.length) return '';
+
+  try {
+    return execFileSync('git', [...args, '--', ...paths], {
+      cwd: ROOT,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim().split('\n').filter(Boolean)[0] || '';
+  } catch {
+    return '';
+  }
+}
+
+function projectGitDates(slug) {
+  const paths = PROJECT_GIT_PATHS[slug];
+  if (!paths) return {};
+
+  return {
+    startedAt: gitLogDate(paths, ['log', '--reverse', '--format=%aI']),
+    updatedAt: gitLogDate(paths, ['log', '-1', '--format=%aI']),
+  };
 }
 
 function escapeYamlValue(value) {
@@ -127,6 +163,8 @@ function buildPostFrontmatter(post) {
 
 function buildProjectFrontmatter(proj) {
   const stack = Array.isArray(proj.stack) ? proj.stack : [];
+  const slug = proj.slug || proj.id;
+  const gitDates = projectGitDates(slug);
 
   const fm = {
     title: proj.name || proj.title || 'Untitled',
@@ -139,11 +177,11 @@ function buildProjectFrontmatter(proj) {
     featured: proj.featured === true || undefined,
     repoUrl: proj.repoUrl || undefined,
     demoUrl: proj.demoUrl || undefined,
-    startedAt: formatDate(proj.created),
-    updatedAt: formatDate(proj.updated),
+    startedAt: formatDate(gitDates.startedAt) || formatDate(proj.created),
+    updatedAt: formatDate(gitDates.updatedAt) || formatDate(proj.updated),
   };
 
-  Object.keys(fm).forEach(k => { if (fm[k] === undefined) delete fm[k]; });
+  Object.keys(fm).forEach(k => { if (fm[k] === undefined || fm[k] === '') delete fm[k]; });
 
   return fm;
 }

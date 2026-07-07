@@ -8,6 +8,8 @@
 
 **Tech Stack:** Astro 6、Astro Content Collections、TypeScript、Markdown、CSS、可选 React islands
 
+> **Progress Note (2026-07-07):** 这份计划里的 Search 已经收口成导航内联放大镜，不再保留独立 `/search/` 路由；首页与主要内容页也已经共享站点级 cinematic 背景层。`pet-necklace` 的项目时间戳开始改从 git 历史提取，避免回落成 `1970-01-01`。
+
 ---
 
 ### Task 1: 改动前基线确认
@@ -394,13 +396,14 @@ git add src/pages/about.astro README.md
 git commit -m "docs: align about page and readme with site direction"
 ```
 
-### Task 11: 让 Search 反映更丰富的内容图谱
+### Task 11: 让 Search 收口为导航内联搜索
 
 **Files:**
 - Modify: `src/lib/search-index.ts`
-- Modify: `src/pages/search.astro`
+- Modify: `src/components/Nav.astro`
+- Delete: `src/pages/search.astro`
 
-**Step 1: 扩展索引字段**
+**Step 1: 复用现有静态索引**
 
 纳入：
 - tags
@@ -408,24 +411,20 @@ git commit -m "docs: align about page and readme with site direction"
 - stack
 - 关联项提示
 
-**Step 2: 优化搜索结果描述**
+**Step 2: 将结果入口放进导航**
 
-尽量在结果中体现其类型：
-- post
-- project
-- series
-- demo
+用放大镜触发内联搜索面板，保留静态索引和即时过滤，但不再维护独立 Search 页面。
 
 **Step 3: 构建验证**
 
 Run: `npm run build`
-Expected: 搜索仍保持静态嵌入索引方案，但命中质量更高。
+Expected: 放大镜搜索可用，`/search/` 路由不再生成。
 
 **Step 4: Commit**
 
 ```bash
-git add src/lib/search-index.ts src/pages/search.astro
-git commit -m "feat: enrich static search metadata"
+git add src/lib/search-index.ts src/components/Nav.astro src/pages/search.astro
+git commit -m "feat: inline site search in navigation"
 ```
 
 ### Task 12: 为 Demo 页补齐上下文

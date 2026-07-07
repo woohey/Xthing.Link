@@ -9,7 +9,6 @@ export const ROUTES = {
   blog: '/blog',
   about: '/about',
   demos: '/demos',        // legacy → redirects to /works
-  search: '/search',
   rss: '/rss.xml',
 } as const;
 

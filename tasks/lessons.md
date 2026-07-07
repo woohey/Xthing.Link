@@ -1,5 +1,15 @@
 # Lessons Learned
 
+## 2026-07-07: 站点级视觉层要只保留一份真相
+**What happened:** 动态视频背景从单页方案扩展到全站默认层后，又把 Search 收口成导航内联搜索。
+**Why it mattered:** 这类视觉和入口组件一旦分散到多个页面，就会很快出现样式、可见性和文案分叉。
+**Rule:** 公共视觉层和公共入口尽量放在 `BaseLayout` / `Nav` 这一层统一管理，页面只负责内容本身。
+
+## 2026-07-07: 项目时间戳别信空字段
+**What happened:** `pet-necklace` 的 `startedAt` / `updatedAt` 原来落到空值，渲染成了 `1970-01-01`。
+**Why it mattered:** 对代码项目来说，PB 的 `created` / `updated` 不一定能代表真实开始和活跃时间。
+**Rule:** 对于主要由 git 驱动的项目，时间戳优先从仓库历史提取；PB 只保留内容真相，不承担版本历史语义。
+
 ## 2026-07-04: SSR over-engineering
 **What happened:** 初始方案用 Astro Hybrid SSR + Node 常驻进程来实现「动态发布」。
 **Why it was wrong:** solo 博客 build 只要 30 秒，SSR 带来的 Node 进程管理、SSR 缓存、页面重写等复杂度远大于收益。用户的「动态」需求本质是自动化发布工作流，不是运行时渲染。

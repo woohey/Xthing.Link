@@ -1,7 +1,9 @@
 ---
 import { ROUTES } from '../lib/routes';
+import { getAllSearchEntries } from '../lib/search-index';
 
 const pathname = Astro.url.pathname;
+const searchEntries = await getAllSearchEntries();
 
 type NavItem = { href: string; label: string; isActive: (path: string) => boolean };
 
@@ -31,11 +33,6 @@ const items: NavItem[] = [
     label: 'About',
     isActive: (p) => p === ROUTES.about,
   },
-  {
-    href: ROUTES.search,
-    label: 'Search',
-    isActive: (p) => p === ROUTES.search,
-  },
 ];
 ---
 
@@ -62,6 +59,21 @@ const items: NavItem[] = [
         <a href="/rss.xml" type="application/rss+xml" class="rss-link">
           RSS
         </a>
+      </li>
+      <li class="site-nav__search">
+        <details class="nav-search">
+          <summary class="nav-search__toggle" aria-label="Search site">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+          </summary>
+          <div class="nav-search__panel">
+            <label class="sr-only" for="nav-search-input">Search</label>
+            <input id="nav-search-input" class="nav-search__input" type="search" placeholder="Search…" autocomplete="off" />
+            <ul class="nav-search__results" id="nav-search-results" role="list"></ul>
+          </div>
+        </details>
       </li>
     </ul>
   </div>
@@ -144,6 +156,10 @@ const items: NavItem[] = [
     opacity: 0.85;
   }
 
+  .site-nav__search {
+    position: relative;
+  }
+
   .site-nav a {
     border-radius: 10px;
     padding: 0.45rem 0.65rem;
@@ -152,6 +168,85 @@ const items: NavItem[] = [
   .site-nav a:hover {
     background: color-mix(in oklab, var(--accent) 10%, transparent);
     text-decoration: none;
+  }
+
+  .nav-search {
+    position: relative;
+  }
+
+  .nav-search__toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    color: var(--fg);
+    cursor: pointer;
+    list-style: none;
+    transition: color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
+  }
+
+  .nav-search__toggle::-webkit-details-marker {
+    display: none;
+  }
+
+  .nav-search__toggle:hover,
+  .nav-search[open] .nav-search__toggle {
+    color: var(--accent);
+    background: color-mix(in oklab, var(--accent) 10%, transparent);
+  }
+
+  .nav-search__panel {
+    position: absolute;
+    top: calc(100% + 0.65rem);
+    right: 0;
+    z-index: 70;
+    width: min(22rem, calc(100vw - 2rem));
+    padding: var(--space-3);
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--color-bg) 88%, transparent);
+    box-shadow: var(--shadow-light), var(--shadow-dark);
+    backdrop-filter: blur(18px) saturate(1.08);
+    -webkit-backdrop-filter: blur(18px) saturate(1.08);
+  }
+
+  .nav-search__input {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.7rem 0.9rem;
+    border: none;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--color-bg) 78%, transparent);
+    color: var(--color-text);
+    box-shadow: var(--shadow-inset-light), var(--shadow-inset-dark);
+    font: inherit;
+  }
+
+  .nav-search__input:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .nav-search__results {
+    display: grid;
+    gap: var(--space-2);
+    list-style: none;
+    margin: var(--space-3) 0 0;
+    padding: 0;
+  }
+
+  .nav-search__result a {
+    display: block;
+    padding: 0.65rem 0.75rem;
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font-size: var(--text-sm);
+  }
+
+  .nav-search__result a:hover {
+    background: rgba(0, 188, 212, 0.08);
+    color: var(--color-primary);
   }
 
   @media (max-width: 420px) {
@@ -173,5 +268,62 @@ const items: NavItem[] = [
     .site-nav a {
       padding: 0.38rem 0.5rem;
     }
+
+    .nav-search__panel {
+      left: 0;
+      right: auto;
+      width: min(20rem, calc(100vw - 1.5rem));
+    }
   }
 </style>
+
+<script define:vars={{ searchEntries }}>
+  const searchRoot = document.querySelector('.nav-search');
+  const searchInput = document.getElementById('nav-search-input');
+  const searchResults = document.getElementById('nav-search-results');
+
+  function normalizeSearchText(text) {
+    return String(text ?? '').toLowerCase().trim();
+  }
+
+  function matchesSearch(query, item) {
+    if (!query) return false;
+    const haystack = normalizeSearchText([item.title, item.description, item.keywords].filter(Boolean).join(' '));
+    return haystack.includes(query);
+  }
+
+  function renderNavSearch() {
+    if (!searchInput || !searchResults) return;
+    const query = normalizeSearchText(searchInput.value);
+    searchResults.innerHTML = '';
+    const results = searchEntries.filter((item) => matchesSearch(query, item)).slice(0, 8);
+
+    for (const item of results) {
+      const li = document.createElement('li');
+      li.className = 'nav-search__result';
+      const a = document.createElement('a');
+      a.href = item.href;
+      a.textContent = item.title;
+      li.append(a);
+      searchResults.append(li);
+    }
+  }
+
+  if (searchRoot && searchInput && searchResults) {
+    searchRoot.addEventListener('toggle', () => {
+      if (searchRoot.open) {
+        window.setTimeout(() => searchInput.focus(), 0);
+      }
+    });
+    searchInput.addEventListener('input', renderNavSearch);
+    searchInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        const firstLink = searchResults.querySelector('a');
+        if (firstLink) {
+          event.preventDefault();
+          window.location.href = firstLink.href;
+        }
+      }
+    });
+  }
+</script>

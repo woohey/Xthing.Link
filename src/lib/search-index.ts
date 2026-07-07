@@ -49,12 +49,6 @@ function basePages(): SearchIndexEntry[] {
       description: 'About this site and contact context.',
       keywords: 'about contact',
     },
-    {
-      title: 'Search',
-      href: ROUTES.search,
-      description: 'Search pages across the site.',
-      keywords: 'search find',
-    },
   ];
 }
 
@@ -74,7 +68,7 @@ export async function getAllSearchEntries(): Promise<SearchIndexEntry[]> {
 
   const projectEntries: SearchIndexEntry[] = projects.map((p) => ({
     title: p.data.title,
-    href: `${ROUTES.projects}/${p.id}/`,
+    href: `${ROUTES.works}/${p.id}/`,
     description: p.data.description,
     keywords: ['project', p.data.demoSlug ? `demo ${p.data.demoSlug}` : '', p.data.status ?? '']
       .filter(Boolean)

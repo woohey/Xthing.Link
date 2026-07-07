@@ -116,6 +116,52 @@ body {
   overflow-x: hidden;
 }
 
+.has-cinematic-bg {
+  background: var(--color-bg);
+}
+
+.cinematic-home-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--color-bg);
+}
+
+.cinematic-home-bg__video {
+  position: absolute;
+  inset: auto 0 0 0;
+  top: 300px;
+  width: 100%;
+  height: calc(100% - 300px);
+  object-fit: cover;
+  object-position: center top;
+  opacity: 0;
+  transition: opacity 80ms linear;
+}
+
+.cinematic-home-bg__gradient {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, var(--color-bg) 0%, rgba(240, 245, 246, 0.3) 30%, rgba(240, 245, 246, 0.08) 58%, rgba(240, 245, 246, 0.64) 100%),
+    linear-gradient(to right, rgba(240, 245, 246, 0.4), rgba(240, 245, 246, 0.04) 45%, rgba(240, 245, 246, 0.34));
+}
+
+.cinematic-home-bg__wash {
+  position: absolute;
+  inset: 0;
+  background: rgba(240, 245, 246, 0.04);
+  backdrop-filter: saturate(1.08);
+  -webkit-backdrop-filter: saturate(1.08);
+}
+
+.has-cinematic-bg .shell {
+  position: relative;
+  z-index: 1;
+}
+
 a {
   color: var(--color-primary);
   text-decoration: none;
@@ -1645,4 +1691,121 @@ code {
 
 .pet-dashboard__table tbody tr:hover {
   background: rgba(0, 188, 212, 0.04);
+}
+
+/* ============================================================
+   CINEMATIC BACKGROUND OVERRIDES
+   ============================================================ */
+
+.has-cinematic-bg .site-nav {
+  background: rgba(240, 245, 246, 0.76);
+  backdrop-filter: blur(18px) saturate(1.08);
+  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+}
+
+.has-cinematic-bg .card,
+.has-cinematic-bg .feature-card,
+.has-cinematic-bg .preview-panel,
+.has-cinematic-bg .article-sidecard,
+.has-cinematic-bg .catalog-feature,
+.has-cinematic-bg .writing-directory,
+.has-cinematic-bg .series-showcase__item,
+.has-cinematic-bg .soft-pill {
+  background: color-mix(in oklab, var(--color-bg) 84%, transparent);
+  backdrop-filter: blur(14px) saturate(1.08);
+  -webkit-backdrop-filter: blur(14px) saturate(1.08);
+}
+
+.has-cinematic-bg .preview-panel__card,
+.has-cinematic-bg .preview-panel__mini,
+.has-cinematic-bg .badge,
+.has-cinematic-bg .preview-chip {
+  background: color-mix(in oklab, var(--color-bg) 76%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.has-cinematic-bg .preview-panel__card--soft,
+.has-cinematic-bg .story-card--lead {
+  background: rgba(0, 188, 212, 0.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cinematic-home-bg__video {
+    display: none;
+  }
+}
+
+/* ============================================================
+   PROJECT TAXONOMY
+   ============================================================ */
+
+.work-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.project-taxonomy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.project-taxonomy--detail {
+  margin-top: var(--space-5);
+}
+
+.project-taxonomy__group {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.project-taxonomy__label {
+  color: var(--color-text-subtle);
+  font-family: var(--font-brand);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.project-taxonomy__chips,
+.project-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem var(--space-3);
+  align-items: center;
+}
+
+.project-actions {
+  margin-top: auto;
+  padding-top: var(--space-2);
+  gap: var(--space-2);
+}
+
+.project-taxonomy__item {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+.project-taxonomy__item + .project-taxonomy__item::before {
+  content: '/';
+  margin-right: var(--space-3);
+  color: var(--color-text-subtle);
+}
+
+.badge--link {
+  color: var(--color-text);
+  text-decoration: none;
+  transition: color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.badge--link:hover {
+  color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow:
+    -3px -3px 8px rgba(255, 255, 255, 0.85),
+    3px 3px 8px rgba(155, 195, 205, 0.5);
 }

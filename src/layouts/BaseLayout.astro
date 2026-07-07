@@ -1,4 +1,5 @@
 ---
+import CinematicHero from '../components/CinematicHero';
 import Nav from '../components/Nav.astro';
 import '../styles/global.css';
 import { SITE } from '../lib/site';
@@ -30,7 +31,8 @@ const fullTitle = title === SITE.name ? title : `${title} · ${SITE.name}`;
       href={new URL(ROUTES.rss, Astro.site ?? SITE.url)}
     />
   </head>
-  <body>
+  <body class="has-cinematic-bg">
+    <CinematicHero client:load />
     <div class="shell">
       <a class="skip-link" href="#main">Skip to content</a>
       <Nav />

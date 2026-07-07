@@ -16,6 +16,15 @@
         "shipped"
       ]
     },
+    "deployType": {
+      "type": "string",
+      "enum": [
+        "static-deployed",
+        "embedded",
+        "github-only",
+        "planned"
+      ]
+    },
     "demoSlug": {
       "type": "string"
     },
