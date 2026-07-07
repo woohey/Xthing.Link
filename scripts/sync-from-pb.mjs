@@ -111,6 +111,21 @@ function escapeYamlValue(value) {
   return value;
 }
 
+// PB collections may use either `json` type (returns array) or `text` type
+// (returns the raw string we wrote). When syncing from a server PB whose
+// tags/stack fields are text, callers store JSON-serialized arrays; this
+// helper parses them back into arrays for the YAML frontmatter.
+function normalizeListField(value) {
+  if (Array.isArray(value)) return value;
+  if (typeof value !== 'string' || !value.trim()) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return value.split(',').map((s) => s.trim()).filter(Boolean);
+  }
+}
+
 function rawProjectBody(proj) {
   return typeof proj.description === 'string' ? proj.description : '';
 }
@@ -177,7 +192,7 @@ async function fetchAll(collection, filter = '') {
 // ---------------------------------------------------------------------------
 
 function buildPostFrontmatter(post) {
-  const tags = Array.isArray(post.tags) ? post.tags : [];
+  const tags = normalizeListField(post.tags);
   const content = post.content || '';
 
   const fm = {
@@ -203,7 +218,7 @@ function buildPostFrontmatter(post) {
 }
 
 function buildProjectFrontmatter(proj) {
-  const stack = Array.isArray(proj.stack) ? proj.stack : [];
+  const stack = normalizeListField(proj.stack);
   const slug = proj.slug || proj.id;
   const gitDates = projectGitDates(slug);
 
@@ -213,7 +228,7 @@ function buildProjectFrontmatter(proj) {
     status: proj.status || 'idea',
     deployType: proj.deployType || 'planned',
     order: proj.order ?? 1000,
-    tags: proj.tags || [],
+    tags: normalizeListField(proj.tags),
     stack,
     featured: proj.featured === true || undefined,
     repoUrl: proj.repoUrl || undefined,
