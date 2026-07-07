@@ -4,11 +4,11 @@
 
 **Goal:** 将 Xthing.Link 从“栏目索引站”升级为“内容驱动的技术写作主站”，补齐更丰富的内容元数据、专题结构，以及文章、项目、Demo 之间的互链关系，同时支持以 Obsidian 为源头的写作与多平台分发工作流。
 
-**Architecture:** 继续采用 Astro 静态优先架构。通过扩展 Astro Content Collections、增加专题路由、调整现有页面模板，让首页、Writing、Series、Projects 和 Search 都围绕内容主轴组织。Series 在信息架构上保留一级入口，但保持低于 Writing 的内容优先级。React islands 仅在后续确实需要交互时引入。部署目标保持为阿里云轻量应用服务器上的静态站点，由 Nginx 或 Caddy 对外提供 `dist/` 目录内容。
+**Architecture:** 继续采用 Astro 静态优先架构。通过扩展 Astro Content Collections、增加专题路由、调整现有页面模板，让首页、Writing、Series、Works 和导航内联 Search 都围绕内容主轴组织。Series 在信息架构上保留一级入口，但保持低于 Writing 的内容优先级。React islands 仅在后续确实需要交互时引入。部署目标保持为阿里云轻量应用服务器上的静态站点，由 Nginx 或 Caddy 对外提供 `dist/` 目录内容。
 
 **Tech Stack:** Astro 6、Astro Content Collections、TypeScript、Markdown、CSS、可选 React islands
 
-> **Progress Note (2026-07-07):** 这份计划里的 Search 已经收口成导航内联放大镜，不再保留独立 `/search/` 路由；首页与主要内容页也已经共享站点级 cinematic 背景层。`pet-necklace` 的项目时间戳开始改从 git 历史提取，避免回落成 `1970-01-01`。
+> **Progress Note (2026-07-07):** 这份计划里的 Search 已经收口成导航内联放大镜，不再保留独立 `/search/` 路由；首页与主要内容页也已经共享站点级 cinematic 背景层。`pet-necklace` 的项目时间戳开始改从 git 历史提取，避免回落成 `1970-01-01`。Works 已补入 `8bees`、`aquasmart` 两个历史项目档案，并形成 `public/media/<slug>/` 媒体约定。
 
 ---
 
@@ -503,9 +503,9 @@ Expected: PASS 或只有可接受警告
 - `/`
 - `/blog/`
 - `/series/`
-- `/projects/`
-- `/demos/`
-- `/search/`
+- `/works/`
+- `/works/pet-necklace/`
+- 导航栏放大镜内联搜索
 
 Expected: 关键页面都能正常渲染，且内容关系清晰。
 

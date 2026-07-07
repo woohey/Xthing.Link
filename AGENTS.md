@@ -43,14 +43,20 @@
 - 新增/修改：Obsidian 写完 → 快捷键推送 PB → webhook 自动 build
 - 状态字段：`draft` = 不显示（sync 过滤），`published` = 显示
 - **禁止直接在 `src/content/blog/` 下创建 .md 文件**
+- 首页 Hero 副标题读取 slug 为 `welcome` 的文章 `summary/description`；多行文本会按换行显示。预览 `dist/` 时必须 `npm run build`，只 `npm run sync` 不会更新 `astro preview`
 
 ### 项目/Works（projects collection）
 - 新增/修改：在 PB Admin UI `projects` collection 操作
+- slug 使用小写，避免大小写变化造成 Astro content id/cache 重复
 - deployType 展示逻辑：
   - `static-deployed`：nginx alias 静态文件 → 卡片显示「在线体验」
   - `embedded`：嵌入式演示页（如 `/demos/pet-necklace/`）
   - `github-only`：卡片显 GitHub 链接
   - `planned`：标记「规划中」
+- 历史档案项目：`deployType = planned` + `archive` 标签 → 显示「历史归档」；没有 repo/demo 链接时详情页右侧显示「项目档案」
+- 项目正文可用 `<p data-summary-only="true">...</p>` 提供卡片摘要，sync 会写入 frontmatter 并从详情正文剥离
+- 项目静态媒体放在 `public/media/<slug>/`，PB 正文中以 `/media/<slug>/filename.ext` 引用，不写本机绝对路径
+- `.work-screenshot-card img` 会启用项目详情页 Lightbox 大图预览
 - 独立部署的新项目产物放在 `/home/wuzz/<slug>/dist/`，nginx 单独配
 
 ### 跨平台分发（platforms collection）
@@ -80,7 +86,7 @@ Xthing.Link/
 │   │   ├── works/                # Works 板块（合并 projects+demos）
 │   │   ├── projects/             # → redirect to /works
 │   │   └── demos/                # 保留嵌入式演示页
-│   └── styles/global.css         # 新拟态设计（~1649 行），不变
+│   └── styles/global.css         # 新拟态 + cinematic 背景与 Works 媒体样式
 ├── pocketbase/                   # 仅服务器，不入 git
 ├── docs/
 │   ├── plans/v2-architecture-upgrade.md
@@ -96,6 +102,9 @@ Xthing.Link/
 - 颜色 `#00BCD4` / 阴影 `-8px -8px 20px` / 圆角 / 字体 `Quicksand`+`Nunito` 不变
 - 新增页面复用现有 `.neu-card` `.feature-card` `.badge` `.btn-primary` 体系
 - Nav 统一为 Works（合并 Projects + Demos）
+- 全站通过 `BaseLayout` 挂载 `CinematicHero` 视频背景，`VIDEO_MAX_OPACITY = 0.9`
+- 独立 `/search/` 页面已退场，Nav 放大镜负责内联搜索
+- Works 的技术/状态/主题分类保持文字型，功能链接保留可点击 chip
 - 不支持：暗色模式、多语言、评论
 
 ## Deployment | 部署规则

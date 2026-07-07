@@ -7,6 +7,7 @@ import {
   displayStack,
   displayTopicTags,
   projectActions,
+  projectHeroAsset,
   statusLabel,
 } from '../../lib/project-display';
 import { ROUTES } from '../../lib/routes';
@@ -27,10 +28,33 @@ const {
   startedAt, updatedAt,
 } = entry.data;
 const projectStatus = statusLabel(status);
-const projectDeployment = deployLabel(deployType);
+const projectDeployment = deployLabel(deployType, entry.data.tags);
 const stack = displayStack(entry);
 const topicTags = displayTopicTags(entry);
 const actions = projectActions(entry).filter((action) => action.label !== '详情');
+const heroAsset = projectHeroAsset(entry);
+const hasProjectLinks = actions.length > 0;
+const isArchiveProject = entry.data.tags?.some((tag: string) => tag.toLowerCase() === 'archive') ?? false;
+const formatProjectDate = (date?: Date) => date ? new Date(date).toLocaleDateString('en-CA') : null;
+const startedAtLabel = formatProjectDate(startedAt);
+const updatedAtLabel = formatProjectDate(updatedAt);
+const archiveProfiles: Record<string, string> = {
+  '8bees': '校园零用工 / 移动应用',
+  aquasmart: '智能硬件 / 社交 App',
+};
+const archiveRows = isArchiveProject && !hasProjectLinks
+  ? [
+      { label: '类型', value: projectDeployment ?? '历史归档' },
+      {
+        label: '周期',
+        value: startedAtLabel && updatedAtLabel
+          ? `${startedAtLabel} – ${updatedAtLabel}`
+          : startedAtLabel ?? updatedAtLabel,
+      },
+      { label: '形态', value: archiveProfiles[entry.id] ?? topicTags.slice(0, 2).join(' / ') },
+    ].filter((row) => row.value)
+  : [];
+const showProjectSidecard = hasProjectLinks || archiveRows.length > 0;
 ---
 
 <BaseLayout title={title} description={description}>
@@ -42,7 +66,14 @@ const actions = projectActions(entry).filter((action) => action.label !== '详�
       <div class="article-hero__main">
         <p class="soft-pill">Works detail</p>
         <h1 class="page-title">{title}</h1>
-        <p class="page-subtitle">{description}</p>
+        {heroAsset ? (
+          <div class="project-hero-summary">
+            <img class="project-hero-summary__logo" src={heroAsset.src} alt={heroAsset.alt} />
+            <p class="page-subtitle">{description}</p>
+          </div>
+        ) : (
+          <p class="page-subtitle">{description}</p>
+        )}
         <div class="project-taxonomy project-taxonomy--detail">
           <div class="project-taxonomy__group">
             <span class="project-taxonomy__label">状态</span>
@@ -69,36 +100,112 @@ const actions = projectActions(entry).filter((action) => action.label !== '详�
           )}
         </div>
       </div>
-      <aside class="article-sidecard">
-        <p class="article-sidecard__label">项目链接</p>
-        <div class="article-sidecard__rows">
-          {actions.map((action) => (
-            <div class="article-sidecard__row">
-              <span>{action.label}</span>
-              <a href={action.href} target={action.external ? '_blank' : undefined} rel={action.external ? 'noopener' : undefined}>
-                {action.external ? 'Open external' : 'Open'}
-              </a>
-            </div>
-          ))}
-          {startedAt && (
-            <div class="article-sidecard__row">
-              <span>开始</span>
-              <strong>{new Date(startedAt).toLocaleDateString('en-CA')}</strong>
-            </div>
-          )}
-          {updatedAt && (
-            <div class="article-sidecard__row">
-              <span>更新</span>
-              <strong>{new Date(updatedAt).toLocaleDateString('en-CA')}</strong>
-            </div>
-          )}
-        </div>
-      </aside>
+      {showProjectSidecard && (
+        <aside class="article-sidecard">
+          <p class="article-sidecard__label">{hasProjectLinks ? '项目链接' : '项目档案'}</p>
+          <div class="article-sidecard__rows">
+            {hasProjectLinks ? (
+              <>
+                {actions.map((action) => (
+                  <div class="article-sidecard__row">
+                    <span>{action.label}</span>
+                    <a href={action.href} target={action.external ? '_blank' : undefined} rel={action.external ? 'noopener' : undefined}>
+                      {action.external ? 'Open external' : 'Open'}
+                    </a>
+                  </div>
+                ))}
+                {startedAtLabel && (
+                  <div class="article-sidecard__row">
+                    <span>开始</span>
+                    <strong>{startedAtLabel}</strong>
+                  </div>
+                )}
+                {updatedAtLabel && (
+                  <div class="article-sidecard__row">
+                    <span>更新</span>
+                    <strong>{updatedAtLabel}</strong>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                {archiveRows.map((row) => (
+                  <div class="article-sidecard__row">
+                    <span>{row.label}</span>
+                    <strong>{row.value}</strong>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        </aside>
+      )}
     </header>
 
     <div class="article-body">
       <Content />
     </div>
+
+    <div class="image-lightbox" data-image-lightbox hidden>
+      <button class="image-lightbox__scrim" type="button" data-lightbox-close aria-label="关闭大图"></button>
+      <figure class="image-lightbox__figure" role="dialog" aria-modal="true" aria-label="图片预览" tabindex="-1">
+        <button class="image-lightbox__close" type="button" data-lightbox-close aria-label="关闭大图">×</button>
+        <img class="image-lightbox__image" data-lightbox-image alt="" />
+        <figcaption class="image-lightbox__caption" data-lightbox-caption></figcaption>
+      </figure>
+    </div>
+
+    <script>
+      const lightbox = document.querySelector('[data-image-lightbox]');
+      const lightboxImage = lightbox?.querySelector('[data-lightbox-image]');
+      const lightboxCaption = lightbox?.querySelector('[data-lightbox-caption]');
+      const lightboxFigure = lightbox?.querySelector('.image-lightbox__figure');
+      const closeButtons = lightbox?.querySelectorAll('[data-lightbox-close]') ?? [];
+      let lastFocusedElement = null;
+
+      function closeLightbox() {
+        if (!lightbox) return;
+        lightbox.setAttribute('hidden', '');
+        document.body.classList.remove('is-lightbox-open');
+        document.removeEventListener('keydown', onLightboxKeydown);
+        lastFocusedElement?.focus?.();
+      }
+
+      function onLightboxKeydown(event) {
+        if (event.key === 'Escape') closeLightbox();
+      }
+
+      function openLightbox(image) {
+        if (!lightbox || !lightboxImage || !lightboxCaption) return;
+        const figure = image.closest('figure');
+        const caption = figure?.querySelector('figcaption')?.textContent?.trim() || image.alt || '项目图片';
+        lastFocusedElement = document.activeElement;
+        lightboxImage.setAttribute('src', image.currentSrc || image.src);
+        lightboxImage.setAttribute('alt', image.alt || caption);
+        lightboxCaption.textContent = caption;
+        lightbox.removeAttribute('hidden');
+        document.body.classList.add('is-lightbox-open');
+        document.addEventListener('keydown', onLightboxKeydown);
+        lightboxFigure?.focus();
+      }
+
+      document.querySelectorAll('.work-screenshot-card img').forEach((image) => {
+        image.setAttribute('tabindex', '0');
+        image.setAttribute('role', 'button');
+        image.setAttribute('aria-label', `查看大图：${image.alt || '项目图片'}`);
+        image.addEventListener('click', () => openLightbox(image));
+        image.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            openLightbox(image);
+          }
+        });
+      });
+
+      closeButtons.forEach((button) => {
+        button.addEventListener('click', closeLightbox);
+      });
+    </script>
 
     {relatedPosts.length > 0 && (
       <section class="section">

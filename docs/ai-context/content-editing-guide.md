@@ -1,91 +1,130 @@
 # 内容编辑指南
 
-这份文档用于说明如何在本项目里：
+这份文档说明如何在 Xthing.Link v2 中修改内容、首页文案和 Works 项目。当前版本已经进入 PocketBase 驱动模式：内容进 PB，代码和样式进 Git。
 
-- 新增文章
-- 新增项目
-- 修改首页 Hero 文案
-- 使用 IDE 编辑 `.astro` / `.ts` / `.md`
+## 1. 哪些文件可以手动改？
 
-## 1. 可以用 IDE 打开吗？
+可以直接用 IDE 修改：
 
-可以，完全建议你这样做。
+- `.astro`、`.ts`、`.tsx`、`.css`
+- `scripts/` 下的同步和发布脚本
+- `public/` 下的静态资源
+- `docs/`、`tasks/` 下的项目文档
 
-适合直接用 IDE 打开的文件类型：
+不要手动修改：
 
-- `.astro`
-- `.ts`
-- `.md`
-- `.css`
+- `src/content/blog/*.md`
+- `src/content/projects/*.md`
 
-推荐的常见用法：
-
-- 用 IDE 编辑 [src/pages/index.astro](/Users/junzhaowoo/1024MyCoding/Xthing.Link/src/pages/index.astro) 调整首页文案
-- 用 IDE 编辑 [src/content/blog](/Users/junzhaowoo/1024MyCoding/Xthing.Link/src/content/blog) 里的 Markdown 写文章
-- 用 IDE 编辑 [src/content/projects](/Users/junzhaowoo/1024MyCoding/Xthing.Link/src/content/projects) 维护项目页
-- 用 IDE 查看 [src/content.config.ts](/Users/junzhaowoo/1024MyCoding/Xthing.Link/src/content.config.ts) 了解 frontmatter 允许哪些字段
+这两个目录由 `scripts/sync-from-pb.mjs` 从 PocketBase 全量生成。手动改动会在下一次 `npm run sync`、`npm run dev` 或 `npm run build` 时被覆盖。
 
 ## 2. 文章写在哪里？
 
-文章统一写在：
+文章以 PocketBase `posts` collection 为准。
 
-- [src/content/blog](/Users/junzhaowoo/1024MyCoding/Xthing.Link/src/content/blog)
+推荐流程：
 
-你可以直接复制 [blog-post-template.md](/Users/junzhaowoo/1024MyCoding/Xthing.Link/docs/templates/blog-post-template.md) 的内容，新建一个 Markdown 文件，例如：
+1. 在 Obsidian 中写主稿。
+2. 通过 QuickAdd/发布脚本推送到 PB。
+3. 确认 `status = published`。
+4. 执行 `npm run build`，让 `sync-from-pb.mjs` 生成静态页面。
 
-- `src/content/blog/obsidian-workflow.md`
-- `src/content/blog/iot-visualization-notes.md`
+草稿文章保持 `status = draft`，sync 会过滤掉。
 
-## 3. 项目内容写在哪里？
+## 3. Works 项目写在哪里？
 
-项目内容统一写在：
+项目以 PocketBase `projects` collection 为准，在 PB Admin UI 中编辑。
 
-- [src/content/projects](/Users/junzhaowoo/1024MyCoding/Xthing.Link/src/content/projects)
+常用字段：
 
-当前参考文件是：
+- `name` / `slug`：标题和 URL 标识，slug 建议使用小写。
+- `description`：项目正文，支持 PB editor 生成的 HTML。
+- `status`：`idea` / `wip` / `shipped`。
+- `deployType`：`static-deployed` / `embedded` / `github-only` / `planned`。
+- `tags`：主题和归档标签，例如 `archive`、`iot`、`mobile-app`。
+- `stack`：技术栈，例如 `Astro`、`React`、`TypeScript`。
+- `repoUrl` / `demoUrl`：代码仓库和在线体验。
 
-- [pet-necklace.md](/Users/junzhaowoo/1024MyCoding/Xthing.Link/src/content/projects/pet-necklace.md)
+历史项目档案可以使用 `deployType = planned` 并加 `archive` 标签。没有实际项目链接时，详情页右侧会显示「项目档案」而不是无意义的快捷链接。
 
-## 4. 首页文案改哪里？
+## 4. 项目图片怎么加？
 
-首页结构在：
+静态项目资产放在：
 
-- [src/pages/index.astro](/Users/junzhaowoo/1024MyCoding/Xthing.Link/src/pages/index.astro)
+```text
+public/media/<slug>/
+```
 
-你最常修改的是这几块：
+例如：
 
-- Hero 左侧文案
-- Hero 右侧预览卡片文案
-- 各 section 标题
+```text
+public/media/8bees/logo.png
+public/media/8bees/app1.jpg
+public/media/aquasmart/AquaU-1.jpeg
+```
 
-中文 Hero 参考文案放在：
+在 PB `description` 中引用时使用站点根路径：
 
-- [homepage-hero-copy-zh.md](/Users/junzhaowoo/1024MyCoding/Xthing.Link/docs/templates/homepage-hero-copy-zh.md)
+```html
+<img src="/media/8bees/logo.png" alt="8Bees Logo">
+```
 
-你可以先把文案在这个模板里改顺，再复制到 `index.astro`。
+不要在 PB 中写本机绝对路径，例如 `/Users/woohey/...`。这些路径只能在本机存在，构建到服务器后会失效。
 
-## 5. 修改完成后怎么本地看效果？
+项目详情页里带有 `.work-screenshot-card img` 的图片会自动拥有点击查看大图的 Lightbox 行为，支持鼠标点击、Enter/Space 打开、Esc 关闭。
 
-在项目根目录运行：
+## 5. 项目摘要怎么控制？
+
+`sync-from-pb.mjs` 会用项目正文第一段生成卡片摘要，并剥离 HTML 标签。
+
+如果正文开头需要展示 Logo 或复杂布局，但卡片摘要想单独控制，可以在 PB HTML 中写：
+
+```html
+<p data-summary-only="true">这里是卡片和 Hero 使用的摘要。</p>
+```
+
+这一段只会进入 frontmatter 的 `description`，不会出现在项目详情正文里。
+
+## 6. 首页 Hero 文案改哪里？
+
+首页 Hero 副标题读取 slug 为 `welcome` 的文章摘要/description。
+
+当前支持多行显示，例如：
+
+```text
+xThing.Link ， 探索未知  ，Things worth linking
+「X × IoT × AI，探索一切连接」
+X 是未知，物是万物。连接，是我们选择的方式。一个属于探索者的安静角落。关于技术、连接，以及那些认真做出来的小东西。
+```
+
+修改方式：
+
+1. 在 PB 或 Obsidian 中更新 `welcome` 文章的 description/摘要。
+2. 运行 `npm run build`。
+3. 如果正在看 `astro preview`，刷新页面查看 `dist/` 中的新结果。
+
+只运行 `npm run sync` 会更新临时 `.md`，但不会更新 `astro preview` 正在读取的 `dist/`。
+
+## 7. 本地怎么看效果？
+
+开发模式：
 
 ```bash
 npm run dev
 ```
 
-然后浏览器打开：
+静态预览模式：
 
-```text
-http://127.0.0.1:4321/
+```bash
+npm run build
+npm run preview
 ```
 
-## 6. 修改完成后怎么发到服务器？
+如果你修改的是 PB 内容，并且当前浏览器在 `astro preview`，请运行 `npm run build`。`astro preview` 不会自动读取刚同步出来的源码文件，它只服务 `dist/`。
 
-推荐顺序：
+## 8. 当前视觉和搜索约定
 
-1. 本地写文章、改首页
-2. 本地预览确认
-3. 提交到 Git
-4. 推到 GitHub
-5. 服务器执行 `git pull -> npm test -> npm run build -> rsync`
-
-当前你还不需要改服务器，只要先把本地内容整理好就行。
+- 全站通过 `BaseLayout` 挂载同一套 cinematic 视频背景。
+- 背景视频最大透明度为 90%，在 `src/components/CinematicHero.tsx` 中控制。
+- `/search/` 独立页面已经退场，导航右侧放大镜提供内联搜索。
+- Works 列表里的「技术 / 状态 / 主题」使用文字型分类，底部功能链接继续保留可点击 chip。

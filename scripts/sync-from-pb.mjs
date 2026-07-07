@@ -33,6 +33,16 @@ const PROJECT_GIT_PATHS = {
     'docs/plans/pet-necklace-对接开发材料.md',
   ],
 };
+const PROJECT_DATE_OVERRIDES = {
+  '8bees': {
+    startedAt: '2015-01-01',
+    updatedAt: '2016-12-31',
+  },
+  aquasmart: {
+    startedAt: '2018-01-01',
+    updatedAt: '2020-12-31',
+  },
+};
 
 // ---------------------------------------------------------------------------
 // helpers
@@ -80,6 +90,8 @@ function gitLogDate(paths, args) {
 }
 
 function projectGitDates(slug) {
+  if (PROJECT_DATE_OVERRIDES[slug]) return PROJECT_DATE_OVERRIDES[slug];
+
   const paths = PROJECT_GIT_PATHS[slug];
   if (!paths) return {};
 
@@ -97,6 +109,35 @@ function escapeYamlValue(value) {
     return value;
   }
   return value;
+}
+
+function rawProjectBody(proj) {
+  return typeof proj.description === 'string' ? proj.description : '';
+}
+
+function stripHtml(value) {
+  return value
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function cleanProjectBody(proj) {
+  return rawProjectBody(proj)
+    .replace(/^---[\s\S]*?---\n?/, '')
+    .replace(/<[^>]*data-summary-only=["']?true["']?[^>]*>[\s\S]*?<\/[^>]+>/gi, '')
+    .replace(/<p>(?:\s|&nbsp;|\u00a0|<br\s*\/?>)*<\/p>/gi, '')
+    .trim();
+}
+
+function projectSummary(proj) {
+  const summaryOnly = rawProjectBody(proj).match(/<[^>]*data-summary-only=["']?true["']?[^>]*>([\s\S]*?)<\/[^>]+>/i);
+  const source = summaryOnly?.[1] ?? cleanProjectBody(proj).split(/\n\s*\n/)[0];
+
+  return stripHtml(source)
+    .split(/\n\s*\n/)[0]
+    .slice(0, 200);
 }
 
 // ---------------------------------------------------------------------------
@@ -168,7 +209,7 @@ function buildProjectFrontmatter(proj) {
 
   const fm = {
     title: proj.name || proj.title || 'Untitled',
-    description: proj.description ? proj.description.slice(0, 200) : '',
+    description: projectSummary(proj),
     status: proj.status || 'idea',
     deployType: proj.deployType || 'planned',
     order: proj.order ?? 1000,
@@ -201,7 +242,12 @@ function frontmatterToString(fm) {
     } else if (typeof value === 'number') {
       lines.push(`${key}: ${value}`);
     } else if (typeof value === 'string') {
-      lines.push(`${key}: ${escapeYamlValue(value)}`);
+      if (value.includes('\n')) {
+        lines.push(`${key}: |-`);
+        value.split('\n').forEach(line => lines.push(`  ${line}`));
+      } else {
+        lines.push(`${key}: ${escapeYamlValue(value)}`);
+      }
     }
   }
   lines.push('---', '');
@@ -218,10 +264,7 @@ function buildPostMarkdown(post) {
 function buildProjectMarkdown(proj) {
   const fm = buildProjectFrontmatter(proj);
   const yaml = frontmatterToString(fm);
-  // description in PB is richtext (markdown), use as body
-  const body = typeof proj.description === 'string' ? proj.description : '';
-  // Keep body concise — strip frontmatter-like markers from richtext
-  const cleanBody = body.replace(/^---[\s\S]*?---\n?/, '').trim();
+  const cleanBody = cleanProjectBody(proj);
   return yaml + (cleanBody || proj.name || '') + '\n';
 }
 

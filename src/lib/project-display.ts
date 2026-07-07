@@ -28,12 +28,21 @@ const DEPLOY_LABELS: Record<string, string> = {
 
 const TAG_LABELS: Record<string, string> = {
   ai: 'AI',
+  archive: '历史归档',
+  aquatics: '水族生态',
+  attendance: '考勤',
   biotope: '原生生境',
+  community: '社区',
   dashboard: '仪表盘',
   iot: 'IoT',
   'knowledge-graph': '知识图谱',
+  labor: '蓝领用工',
   literature: '文学阅读',
+  'mobile-app': '移动应用',
   reading: '阅读伴侣',
+  recruiting: '招聘',
+  'smart-hardware': '智能硬件',
+  startup: '创业项目',
   visualization: '可视化',
 };
 
@@ -58,7 +67,12 @@ export function statusLabel(status?: string) {
   return status ? STATUS_LABELS[status] ?? status : null;
 }
 
-export function deployLabel(deployType?: string) {
+export function deployLabel(deployType?: string, tags: string[] = []) {
+  const normalizedTags = tags.map((tag) => tag.toLowerCase());
+  if (deployType === 'planned' && normalizedTags.includes('archive')) {
+    return '历史归档';
+  }
+
   return deployType ? DEPLOY_LABELS[deployType] ?? deployType : null;
 }
 
@@ -85,6 +99,24 @@ export function projectExperienceUrl(project: ProjectLike) {
 
   if (project.data.deployType === 'static-deployed') {
     return project.data.demoUrl ?? null;
+  }
+
+  return null;
+}
+
+export function projectHeroAsset(project: ProjectLike) {
+  if (project.id === '8bees') {
+    return {
+      src: '/media/8bees/logo.png',
+      alt: '8Bees Logo',
+    };
+  }
+
+  if (project.id === 'aquasmart') {
+    return {
+      src: '/media/aquasmart/logo.png',
+      alt: 'AquaSmart Logo',
+    };
   }
 
   return null;

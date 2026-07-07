@@ -1,6 +1,17 @@
 # 首页 Hero 中文文案模板
 
-下面这版文案适合直接替换 [src/pages/index.astro](/Users/junzhaowoo/1024MyCoding/Xthing.Link/src/pages/index.astro) 里的 Hero 区域。
+> 这份模板是早期首页重构参考，不再是当前首页文案入口。
+> 现在首页 Hero 副标题由 PocketBase 中 slug 为 `welcome` 的文章摘要/description 驱动；修改后执行 `npm run build`。
+
+当前推荐维护格式：
+
+```text
+xThing.Link ， 探索未知  ，Things worth linking
+「X × IoT × AI，探索一切连接」
+X 是未知，物是万物。连接，是我们选择的方式。一个属于探索者的安静角落。关于技术、连接，以及那些认真做出来的小东西。
+```
+
+下面这版文案仅作为旧版结构参考，不建议直接替换 [src/pages/index.astro](/Users/woohey/1024-Coding/Xthing.Link/src/pages/index.astro)。
 
 ## 左侧主文案
 

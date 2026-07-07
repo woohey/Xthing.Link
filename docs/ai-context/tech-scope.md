@@ -10,7 +10,7 @@
 
 ## 后端 / 内容中枢
 
-- **PocketBase v0.39.5**：单 Go 二进制，内嵌 SQLite，自带 REST API + Admin UI。
+- **PocketBase v0.27.0**：单 Go 二进制，内嵌 SQLite，自带 REST API + Admin UI。
 - 部署方式：systemd 守护，监听 `127.0.0.1:8090`，通过 nginx `/api/` 反代对外暴露。
 - Admin UI (`/_/`) 受 nginx basic auth 保护。
 
@@ -26,6 +26,22 @@
 - `npm run dev` = `npm run sync && astro dev`
 - sync 脚本从 PB 拉取内容，生成 `src/content/blog/*.md` 和 `src/content/projects/*.md`（临时产物，gitignored）
 - Astro 的 content collection 管道完全不变，仍然从 .md 文件读取
+- `sync-from-pb.mjs` 对多行 frontmatter 字符串使用 YAML block scalar，避免多行摘要导致 Astro 解析失败
+- `sync-from-pb.mjs` 会剥离 PB editor 产生的空段落，并支持 `data-summary-only="true"` 的项目摘要专用段落
+
+## 站点级 UI 层
+
+- **Cinematic 背景层**：`src/layouts/BaseLayout.astro` 挂载 `src/components/CinematicHero.tsx`，首页、Writing、Series、Works、About 等页面共享同一视频背景。
+- **视频透明度**：最大透明度为 90%，由 `VIDEO_MAX_OPACITY = 0.9` 控制。
+- **搜索入口**：独立 `/search/` 页面已移除，导航栏放大镜以内联搜索承接站内检索。
+- **Works 标签**：状态、技术、主题为文字型分类；详情、GitHub、在线体验等动作保留可点击链接。
+
+## Works 媒体与历史档案
+
+- 项目媒体资产放在 `public/media/<slug>/`，由 PB 正文通过 `/media/<slug>/...` 引用。
+- `8bees` 和 `aquasmart` 是历史档案项目，使用 `deployType = planned` + `archive` 标签展示为「历史归档」。
+- 详情页中 `.work-screenshot-card img` 自动支持 Lightbox 大图预览。
+- `pet-necklace` 的项目起止时间由 git 历史推导；`8bees`、`aquasmart` 使用历史日期覆盖，避免空字段回落到 `1970-01-01`。
 
 ## 服务器部署
 

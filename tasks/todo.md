@@ -40,6 +40,16 @@
 - [x] `pet-necklace` 项目时间改为 git 历史
 - [x] Aquaworld 在线体验链接指向站内部署
 
+## Phase 6 — 历史项目档案与内容呈现
+
+- [x] 在 PB projects 中新增 `8bees` 与 `aquasmart` 两个历史 Works 条目
+- [x] 建立 `public/media/<slug>/` 项目媒体目录约定
+- [x] Works 详情页支持项目 Logo、截图网格和点击大图预览
+- [x] 历史档案项目右侧显示「项目档案」，不强行展示无效快捷链接
+- [x] 支持 `data-summary-only="true"` 摘要专用段落，避免详情正文重复
+- [x] 首页 Hero 副标题读取 `welcome` 文章摘要并保留多行显示
+- [x] `sync-from-pb.mjs` 支持多行 YAML、安全剥离 PB editor 空段落
+
 ---
 
 ## 完成记录
@@ -58,3 +68,10 @@
 - Works 页面把状态/技术/主题改成文字型分类，动作链接保留为可点 chip
 - `pet-necklace` 的开始/更新时间改为从 git 历史提取，避免回落到 `1970-01-01`
 - Aquaworld 的在线体验链接已指向站内 `/Aquaworld/`
+
+### 2026-07-07 — 历史项目档案 + 首页 welcome 收口
+- 新增 `8bees` 与 `aquasmart` 两个历史项目档案，分别使用 `public/media/8bees/` 与 `public/media/aquasmart/` 管理项目图片
+- Works 详情页支持 Logo 与摘要并排、截图网格、Lightbox 大图预览，以及归档项目的「项目档案」侧栏
+- PB 项目正文支持 `data-summary-only="true"` 摘要段落，sync 时写入 frontmatter 并从正文剥离
+- 首页 Hero 副标题改为读取 `welcome` 文章摘要/description，多行站点宣言按换行渲染
+- Build 验证通过；旧测试仍有历史断言需要后续更新

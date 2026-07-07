@@ -8,6 +8,12 @@ import { SITE } from '../lib/site';
 const posts = await getCollection('blog', ({ data }) => data.draft !== true);
 const projects = await getCollection('projects');
 const homepage = pickHomepageSections({ posts, projects });
+const welcomePost = posts.find((post) => post.id === 'welcome');
+const welcomeLines = (welcomePost?.data.summary ?? welcomePost?.data.description ?? '')
+  .split('\n')
+  .map((line) => line.trim())
+  .filter(Boolean);
+const heroSubtitle = welcomeLines.join('\n') || 'IoT × AI × 极客 — 探索、构建、连接。\n「连接，是我们选择的方式」';
 ---
 
 <BaseLayout title={SITE.name}>
@@ -21,7 +27,12 @@ const homepage = pickHomepageSections({ posts, projects });
             <span>X 是未知</span><br />物是万物
           </h1>
           <p class="page-subtitle hero-panel__subtitle">
-            IoT × AI × 极客 — 探索、构建、连接。<br />「连接，是我们选择的方式」
+            {heroSubtitle.split('\n').map((line, index) => (
+              <>
+                {index > 0 && <br />}
+                {line}
+              </>
+            ))}
           </p>
           <div class="hero-panel__actions">
             <a class="primary-link--button" href={ROUTES.blog}>

@@ -373,7 +373,16 @@ PB Admin UI (/_/)
 - [x] `pet-necklace` 的开始/更新时间改用 git 历史，避免 `1970-01-01`
 - [x] Aquaworld 在线体验链接指向站内部署路径
 
-## 11. 与环境相关的文件
+### Phase 6 — 历史项目档案与 PB 内容呈现 ✅ 完成 (2026-07-07)
+
+- [x] 新增 `8bees` 与 `aquasmart` 两个历史 Works 档案
+- [x] 建立 `public/media/<slug>/` 项目媒体约定，并在 PB 正文中用 `/media/<slug>/...` 引用
+- [x] Works 详情页支持项目 Logo + 摘要同栏展示、截图网格和 Lightbox 大图预览
+- [x] `data-summary-only="true"` 支持项目摘要专用段落，避免正文和卡片摘要重复
+- [x] `sync-from-pb.mjs` 清理 PB editor 空段落，并用 YAML block scalar 处理多行摘要
+- [x] 首页 Hero 副标题改为读取 `welcome` 文章摘要/description，保留多行站点宣言
+
+## 12. 与环境相关的文件
 
 | 文件 | 用途 | 管理方式 |
 |------|------|---------|
@@ -384,9 +393,10 @@ PB Admin UI (/_/)
 | `scripts/migrate-to-pb.mjs` | 一次性迁移脚本 | git 追踪 |
 | `src/content/blog/*.md` | 临时内容文件 | `.gitignore` |
 | `src/content/projects/*.md` | 临时项目文件 | `.gitignore` |
+| `public/media/<slug>/` | 项目 Logo、截图和静态媒体 | git 追踪 |
 | `pocketbase/` | PB 二进制 + 数据 | 仅服务器，不入库 |
 
-## 12. 参考资料
+## 13. 参考资料
 
 - 架构原理图：`Vault4AI/Excalidraw/xthing-link-architecture-升级方案.md`
 - 现有 v1 内容工作流：`docs/ai-context/content-workflow.md`

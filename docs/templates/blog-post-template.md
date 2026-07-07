@@ -42,6 +42,6 @@ platforms:
 
 ## 相关链接
 
-- 项目页：`/projects/xxx/`
+- 项目页：`/works/xxx/`
 - Demo 页：`/demos/xxx/`
 - 仓库：`https://github.com/...`

@@ -1,5 +1,20 @@
 # Lessons Learned
 
+## 2026-07-07: PB 富文本里的展示段和摘要段要分开
+**What happened:** 8Bees 与 AquaSmart 项目页需要 Logo、正文、截图混排，但 Works 卡片和 Hero 摘要只需要一段干净文字。
+**Why it mattered:** 如果直接把正文第一段同时当摘要，页面里容易出现重复段落，或者把 HTML 布局内容带进卡片摘要。
+**Rule:** 项目正文需要单独摘要时，使用 `<p data-summary-only="true">...</p>`；sync 写入 frontmatter 后从正文剥离。
+
+## 2026-07-07: `astro preview` 看的是 dist，不是刚同步出来的源码
+**What happened:** 更新 `welcome` 文章后只跑 sync，首页预览没有变化。
+**Why it mattered:** `npm run sync` 只更新 `src/content/**/*.md` 临时产物；`astro preview` 服务的是上一次 build 的 `dist/`。
+**Rule:** 内容变化后，如果浏览器在 preview/dist 上看效果，运行 `npm run build`；开发态才用 `npm run dev` 自动同步并热更新。
+
+## 2026-07-07: 项目媒体路径必须是站点根路径
+**What happened:** 历史项目图片来自本地资料目录，最终需要在站点中稳定显示。
+**Why it mattered:** PB 正文如果写 `/Users/woohey/...` 这样的本机绝对路径，只有本机能看到，服务器和浏览器都无法稳定访问。
+**Rule:** 项目媒体统一放到 `public/media/<slug>/`，PB 正文中只写 `/media/<slug>/filename.ext`。
+
 ## 2026-07-07: 站点级视觉层要只保留一份真相
 **What happened:** 动态视频背景从单页方案扩展到全站默认层后，又把 Search 收口成导航内联搜索。
 **Why it mattered:** 这类视觉和入口组件一旦分散到多个页面，就会很快出现样式、可见性和文案分叉。
